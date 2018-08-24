@@ -53,3 +53,39 @@ export function delCodeValue(data) {
     data
   })
 }
+
+/**
+ *  增加码表 或者 码值
+ * /crm/configCode/addConfig
+ */
+// 请求参数：
+// {
+//   configValue: ''
+//   configName: ''
+//   configDescription: ''
+// }
+// {
+//   "d": null,
+//   "e": "300002",
+//   "m": "码表已存在"
+// }
+// 返回示例二（码表不存在，添加成功）：
+// {
+//   "d": 1,
+//   "e": "000000",
+//   "m": "码表新增成功"
+// }
+
+export function addOrEditCodeTable(isCodeTable, data) {
+  let url = ''
+  if (isCodeTable === true) {
+    url = '/crm/configCode/addCode'
+  } else {
+    url = '/crm/configCode/addCode'
+  }
+  return request({
+    url: url,
+    method: 'post',
+    data
+  })
+}

@@ -5,7 +5,7 @@
         <div class="search_box">
           <el-button type="primary" @click="codeTable('add')" plain>添加</el-button>
           <el-input class="search_input" v-model="searchCon" placeholder="请输入内容">
-            <el-button slot="append" @click="getConfigCodeList" icon="el-icon-search"></el-button>
+            <el-button slot="append" @click="searchCodeTable" icon="el-icon-search"></el-button>
           </el-input>
         </div>
       </el-col>
@@ -66,7 +66,7 @@
           <template slot="prepend">码表描述</template>
         </el-input>
       </el-form-item>
-      <!-- 码值列表 -->
+      <!-- 码值列表 开始-->
        <el-form-item>
         <el-button type="primary" @click="addCodeValue" plain :disabled="disabled">增加</el-button>
       </el-form-item>
@@ -126,16 +126,25 @@
           </el-table-column>
         </el-table>
       </el-form-item>
+      <!-- 码值列表 开始-->
     </el-form>
+    <!-- 列表 底部 开始-->
     <div slot="footer" v-show="showStatus" class="dialog_footer">
       <el-button @click="dialogFormVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      <el-button type="primary" @click="addOrEditCodeTable">确 定</el-button>
     </div>
+    <!-- 列表 底部 开始-->
   </el-dialog>
   </div>
 </template>
 <script>
-import { getConfigCodeList, getCodeValueList, delCodeTable, delCodeValue } from '@/api/gzb_code_table'
+import {
+  getConfigCodeList,
+  getCodeValueList,
+  delCodeTable,
+  delCodeValue,
+  addOrEditCodeTable
+} from '@/api/gzb_code_table'
 export default {
   components: { },
   name: 'codeTableCtrl',
@@ -151,6 +160,7 @@ export default {
       disabled: true, // input 是否可以编辑
       fullscreen: true, // 弹出框是否全屏
       codeValueList: [], // ⭐码值列表数据
+      isAddOrEdit: true, // 用来区分是增加码表还是编辑码值， true是增加码表，false是编辑码值
       // ⭐⭐码值数据格式，用来增加码值时候用
       baeeCodeVal: {
         codeDescription: '',
@@ -181,6 +191,16 @@ export default {
     this.getConfigCodeList()
   },
   methods: {
+    searchCodeTable() {
+      if (this.searchCon === '') {
+        this.$message({
+          type: 'warning',
+          message: '搜索条件不能为空！'
+        })
+        return false
+      }
+      this.getConfigCodeList()
+    },
     /**
      * 把每一行得索引加到row属性上，方便后面做删除操作
      */
@@ -221,7 +241,7 @@ export default {
           })
         } else {
           _this.$message({
-            type: 'waring',
+            type: 'warning',
             message: res.m ? res.m : '删除失败!'
           })
         }
@@ -251,7 +271,7 @@ export default {
             })
           } else {
             _this.$message({
-              type: 'waring',
+              type: 'warning',
               message: res.m ? res.m : '删除失败!'
             })
           }
@@ -283,7 +303,6 @@ export default {
         confimCon = row.codeName
         isDelCodeTable = false
       }
-      console.log(row.id)
       _this.$confirm(confimCon, confimTit, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -325,6 +344,7 @@ export default {
         _this.dialogTit = '编辑码表'
         _this.disabled = false
         _this.showStatus = true
+        _this.isAddOrEdit = false
       } else if (status === 'add') {
         _this.dialogTit = '添加码表'
         _this.dialogCode = {}
@@ -332,11 +352,41 @@ export default {
         _this.codeValueList.push(Object.assign({}, _this.baeeCodeVal))
         _this.disabled = false
         _this.showStatus = true
+        _this.isAddOrEdit = true
       }
+    },
+    /**
+    * 确认 增加/编辑，码表、 码值
+    * */
+    addOrEditCodeTable() {
+      const _this = this
+      const data = {
+
+      }
+      addOrEditCodeTable(_this.isAddOrEdit, data).then(function(response) {
+        const res = response.data
+        if (res.e === '000000') {
+          _this.$message({
+            type: 'success',
+            message: res.m ? res.m : '修改码值成功!'
+          })
+          _this.getConfigCodeList()
+          _this.dialogFormVisible = false
+        } else {
+          _this.$message({
+            type: 'warning',
+            message: res.m ? res.m : '修改码值失败!'
+          })
+        }
+      }).catch(function(err) {
+        _this.$message({
+          type: 'warning',
+          message: err.m ? err.m : '修改码值失败!'
+        })
+      })
     }
   },
   mounted() {
-    // getConfigCodeList()
   },
   destroyed() {
   }

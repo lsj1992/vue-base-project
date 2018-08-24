@@ -2,7 +2,6 @@ import Mock from 'mockjs'
 import loginAPI from './login'
 import errorApi from './error'
 import gzbCodeTable from './gzbCodeTable'
-console.log(gzbCodeTable)
 
 // 登录相关
 Mock.mock(/\/login\/login/, 'post', loginAPI.loginByUsername)
@@ -23,5 +22,10 @@ Mock.mock(/\/crm\/configCode\/deleteCode/, 'post', gzbCodeTable.delCodeValueById
 Mock.mock(/\/crm\/configCode\/queryConfig/, 'post', gzbCodeTable.getConfigCode)
 // 根据码表id删除码表
 Mock.mock(/\/crm\/configCode\/deleteConfig/, 'post', gzbCodeTable.delCodeTableById)
+
+// 增加码表
+Mock.mock(/\/crm\/configCode\/addConfig/, 'post', gzbCodeTable.addCodeTable)
+// 增加码值
+Mock.mock(/\/crm\/configCode\/addCode/, 'post', gzbCodeTable.addCodeValue)
 
 export default Mock

@@ -36,7 +36,6 @@ for (let i = 0; i < 3; i++) {
     configValue: '@word', // 码表值
     codeDescription: '@cparagraph(1)' // 码值描述
   }))
-  console.log('jgeijigji')
 }
 
 codeVal['gzb01TConfig'] = gzb01TConfig
@@ -56,17 +55,6 @@ export default {
     return result
   },
   /**
-   * 删除码表
-   */
-  delCodeTableById: config => {
-    const result = {
-      e: '1',
-      d: 1,
-      m: '删除码表成功'
-    }
-    return result
-  },
-  /**
    * 获取码值列表
    */
   getCodeValueList: config => {
@@ -79,6 +67,17 @@ export default {
     return result
   },
   /**
+   * 删除码表
+   */
+  delCodeTableById: config => {
+    const result = {
+      e: '1',
+      d: 1,
+      m: '删除码表成功'
+    }
+    return result
+  },
+  /**
    * 删除码值
    */
   delCodeValueById: config => {
@@ -86,6 +85,28 @@ export default {
       e: '1',
       d: 1,
       m: '删除码表成功'
+    }
+    return result
+  },
+  /**
+   * 增加码表
+   */
+  addCodeTable: config => {
+    const result = {
+      e: '000000',
+      d: 1,
+      m: '增加码表成功'
+    }
+    return result
+  },
+  /**
+   * 增加码值
+   */
+  addCodeValue: config => {
+    const result = {
+      e: '000000',
+      d: 1,
+      m: '码值修改成功'
     }
     return result
   }

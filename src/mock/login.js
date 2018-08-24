@@ -24,7 +24,6 @@ export default {
   },
   getUserInfo: config => {
     const { token } = param2Obj(config.url)
-    console.log('==============')
     console.log(token)
     if (userMap['admin']) {
       return userMap['admin']
