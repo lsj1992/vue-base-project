@@ -10,7 +10,6 @@
             placeholder="请输入内容">
             <el-button slot="append" @click="searchCodeTable" icon="el-icon-search"></el-button>
           </el-input>
-          <span v-show="errors.has('email')" class="help is-danger">{{ errors.first('email') }}</span>
         </div>
       </el-col>
     </el-row>
@@ -51,6 +50,18 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 码表分页 -->
+    <el-pagination
+      class="pagination_box"
+      background
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="pageSizes"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
     <!-- 对话框用来 查看 编辑 码表 -->
     <el-dialog class="add_code_table" :title="dialogTit" :fullscreen="fullscreen" :visible.sync="dialogFormVisible">
       <!-- 增加表单验证  -->
@@ -198,7 +209,6 @@ export default {
     return {
       searchCon: '', // 搜索框内容
       codeTableList: [], // ⭐码表列表数据
-      count: 0, // 码表总条数
       dialogTit: '', // 弹出框的标题
       showStatus: true, // 弹出框底部按钮是否显示
       dialogFormVisible: false, // 弹出框是否显示
@@ -225,7 +235,8 @@ export default {
       currentPage: 1, // 当前第几页
       total: 0, // 总共多少页
       page: 1, // 页码
-      pageSize: 10, // 每页显示数据
+      pageSizes: [10, 20, 30, 40, 50],
+      pageSize: 5, // 每页显示数据
       loading: false, // 加载状态
       // 添加码表页面表单验证
       validateCodeTable: {
@@ -277,7 +288,9 @@ export default {
         const res = response.data
         if (res.code === 0) {
           _this.$set(_this, 'codeTableList', res.data)
-          _this.count = res.count
+          _this.total = res.count
+          console.log(res)
+          console.log(typeof _this.total)
         }
       })
     },
@@ -457,6 +470,20 @@ export default {
           return false
         }
       })
+    },
+    /**
+     * 切换每页显示条数
+     */
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`)
+      this.getConfigCodeList()
+    },
+    /**
+     * 跳转，上一页上一页
+     */
+    handleCurrentChange(val) {
+      this.getConfigCodeList()
+      console.log(`当前页 跳转: ${val}`)
     }
   },
   mounted() {
@@ -467,9 +494,18 @@ export default {
 </script>
 <style scoped>
 .codeTableCtrl {
-  padding: 0 20px;
-  padding-top: 30px;
+  position: relative;
+  padding: 30px 20px 20px;
+  /* height: calc(100vh - 84px); */
+  overflow: auto;
 }
+/* .pagination_box {
+  position: fixed;
+  left: 0;
+  bottom: -0px;
+  height: 50px;
+  margin: 10px 0;
+} */
 .search_box {
   height: 60px;
   line-height: 60px;
@@ -501,4 +537,5 @@ export default {
 .codeTableCtrl >>> .code_value_table .el-form-item__content {
   height: auto;
 }
+
 </style>

@@ -2,6 +2,7 @@ import Mock from 'mockjs'
 import loginAPI from './login'
 import errorApi from './error'
 import gzbCodeTable from './gzbCodeTable'
+import gzbBanner from './gzbBanner'
 
 // 登录相关
 Mock.mock(/\/login\/login/, 'post', loginAPI.loginByUsername)
@@ -27,5 +28,10 @@ Mock.mock(/\/crm\/configCode\/deleteConfig/, 'post', gzbCodeTable.delCodeTableBy
 Mock.mock(/\/crm\/configCode\/addConfig/, 'post', gzbCodeTable.addCodeTable)
 // 增加码值
 Mock.mock(/\/crm\/configCode\/addCode/, 'post', gzbCodeTable.addCodeValue)
+
+// 根据id获取到banner信息【注意和下面获取banner列表的顺序不能换】
+Mock.mock(/\/crm\/banner\/showBannerById/, 'post', gzbBanner.showBannerById)
+// 获取banner列表
+Mock.mock(/\/crm\/banner\/showBanner/, 'post', gzbBanner.getBannerList)
 
 export default Mock

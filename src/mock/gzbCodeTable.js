@@ -48,7 +48,7 @@ export default {
   getConfigCode: config => {
     const result = {
       code: 0,
-      count: List.length,
+      count: List.length * 5,
       data: List,
       msg: '获取码表列表成功'
     }

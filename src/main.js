@@ -1,11 +1,13 @@
 import Vue from 'vue'
 
 import 'normalize.css/normalize.css'// A modern alternative to CSS resets
-
+import 'vue-photo-preview/dist/skin.css'
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 import '@/styles/index.scss' // global css
+
+import preview from 'vue-photo-preview'
 
 import App from './App'
 import router from './router'
@@ -31,7 +33,15 @@ const config = {
   messages: null,
   strict: true
 }
+// 表单验证 可选
 Vue.use(VeeValidate, config)
+
+// 图片查看
+const option = {
+  fullscreenEl: false, // 关闭全屏按钮
+  bgOpacity: 0.6 // 背景色不透明度
+}
+Vue.use(preview, option)
 
 import * as filters from './filters' // global filters
 
