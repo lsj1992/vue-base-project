@@ -2,7 +2,6 @@
   <div class="errPage-container">
     <errorA></errorA>
     <errorB></errorB>
-    <!-- $t is vue-i18n global function to translate lang -->
     <h3>错误标题</h3>
     <code>
       错误原因

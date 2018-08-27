@@ -1,7 +1,11 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
+import qs from 'Qs'
 // import { getToken, getCsrfToken } from '@/utils/auth'
+
+// axios.defaults.transformRequest = [function(data) {
+// }]
 
 // create an axios instance
 const service = axios.create({
@@ -14,11 +18,9 @@ function csrfSafeMethod(method) {
   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
 }
 service.defaults.headers['crossDomain'] = false
-// service.defaults.headers['xsrfCookieName'] = 'csrftoken'
-// service.defaults.headers['xsrfHeaderName'] = 'x-csrf-token'
-// service.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-// request interceptor
+
 service.interceptors.request.use(config => {
+  const token = store.getters.token
   config.headers['x-csrf-token'] = store.getters.CsrfToken
   // Do something before request is sent
   if (!csrfSafeMethod(config.method) && !config.headers['crossDomain']) {
@@ -29,6 +31,18 @@ service.interceptors.request.use(config => {
   // 让每个请求携带token-- ['X-Token']为自定义key 请根据实际情况自行修改
   if (store.getters.token !== undefined) {
     config.headers['Authorization'] = store.getters.token
+  }
+  if (config.method === 'get') {
+    config.params = {
+      token: token,
+      ...config.params
+    }
+  } else {
+    const data = qs.parse(config.data)
+    config.data = qs.stringify({
+      token: token,
+      ...data
+    })
   }
   return config
 }, error => {

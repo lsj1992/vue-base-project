@@ -1,5 +1,5 @@
 /**
- * Created by jiachenpan on 16/11/18.
+ * 验证规则
  */
 
 export function isvalidUsername(str) {
@@ -43,3 +43,13 @@ export function validateEmail(email) {
   return re.test(email)
 }
 
+/**
+ * 非空
+ */
+export function isEmpty(str) {
+  if (!str || str.trim().length <= 0) {
+    return false
+  } else {
+    return true
+  }
+}

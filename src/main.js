@@ -17,6 +17,22 @@ import './permission' // permission control
 import './mock' // simulation data
 import '@/directive/dialog' // 给elementUI的dialog上加上 v-dialogDrag 指令就可以实现弹窗的全屏和拉伸了
 
+import VeeValidate, { Validator } from 'vee-validate'
+import zh_CN from 'vee-validate/dist/locale/zh_CN'
+
+Validator.localize('zh_CN', zh_CN)
+
+const config = {
+  errorBagName: 'errors', // change if property conflicts.
+  fieldsBagName: 'fieldBags',
+  locale: 'zh_CN',
+  delay: 0,
+  events: 'blur|input',
+  messages: null,
+  strict: true
+}
+Vue.use(VeeValidate, config)
+
 import * as filters from './filters' // global filters
 
 Vue.use(Element, {
