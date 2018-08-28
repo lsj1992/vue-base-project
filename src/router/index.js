@@ -41,20 +41,22 @@ export const constantRouterMap = [
     meta: {
       title: '角色管理',
       icon: 'adminRole',
-      roles: ['admin', 'editor'] // 用来做权限控制
+      keepAlive: false, // 用来区分是否需要缓存
+      roles: ['admin', 'editor'] // 用来做权限控制，暂时没有权限管理，roles必须加上admin才能让菜单栏显示出来
     },
     children: [
       {
         path: 'index',
         component: () => import('@/views/adminCtrl/index'),
         name: 'adminCtrl',
-        meta: { title: '角色管理', noCache: true }
+        keepAlive: false,
+        meta: { title: '角色管理', keepAlive: false, noCache: true }
       },
       {
         path: 'userRuleCtrl',
         component: () => import('@/views/adminCtrl/userRuleCtrl'),
         name: 'userRuleCtrl',
-        meta: { title: '用户角色管理', noCache: true }
+        meta: { title: '用户角色管理', keepAlive: false, noCache: true }
       }
     ]
   },
@@ -74,13 +76,13 @@ export const constantRouterMap = [
         path: 'index',
         name: 'workFlowCtrl',
         component: () => import('@/views/workFlowCtrl/index'),
-        meta: { title: '工作流列表', noCache: true }
+        meta: { title: '工作流列表', keepAlive: false, noCache: true }
       },
       {
         path: 'workFlowAuth',
         component: () => import('@/views/workFlowCtrl/workFlowAuth'),
         name: 'workFlowAuth',
-        meta: { title: '工作流权限', noCache: true }
+        meta: { title: '工作流权限', keepAlive: true, noCache: true }
       }
     ]
   },
@@ -100,13 +102,13 @@ export const constantRouterMap = [
         path: 'index',
         name: 'bannerCtrl',
         component: () => import('@/views/bannerCtrl/index'),
-        meta: { title: '轮播列表', noCache: true }
+        meta: { title: '轮播列表', keepAlive: false, noCache: true }
       },
       {
         path: 'imagesCtrl',
         name: 'imagesCtrl',
         component: () => import('@/views/bannerCtrl/imagesCtrl'),
-        meta: { title: '图片管理', noCache: true }
+        meta: { title: '图片管理', keepAlive: false, noCache: true }
       }
     ]
   },
@@ -126,7 +128,7 @@ export const constantRouterMap = [
         path: 'index',
         name: 'codeTableCtrl',
         component: () => import('@/views/codeTableCtrl/index'),
-        meta: { title: '码表管理', noCache: true }
+        meta: { title: '码表管理', keepAlive: false, noCache: true }
       }
     ]
   }

@@ -1,6 +1,6 @@
 module.exports = {
   NODE_ENV: '"production"',
   ENV_CONFIG: '"sit"',
-  BASE_API: '"https://api-sit"',
-  UPLOAD_API: '"http://127.0.0.1:7001/upload/"'
+  BASE_API: '"http://192.168.3.131:8080/"',
+  UPLOAD_API: '"http://192.168.3.131:8080/gzb/file/"'
 }

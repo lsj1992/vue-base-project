@@ -3,7 +3,6 @@
  */
 
 export function isvalidUsername(str) {
-  console.log(str)
   // const valid_map = ['admin', 'editor']
   // return valid_map.indexOf(str.trim()) >= 0
   return str.replace(/(^\s*)|(\s*$)/g, '').length !== ''
@@ -46,10 +45,21 @@ export function validateEmail(email) {
 /**
  * 非空
  */
-export function isEmpty(str) {
+export function isNotEmpty(str) {
   if (!str || str.trim().length <= 0) {
     return false
   } else {
     return true
+  }
+}
+/**
+ * 手机号
+ */
+export function isPhone(str) {
+  if (isNotEmpty(str)) {
+    const pattern = /^((1[3,5,8][0-9])|(14[5,7])|(17[0,6,7,8])|(19[7]))\d{8}$/
+    return pattern.test(str)
+  } else {
+    return false
   }
 }

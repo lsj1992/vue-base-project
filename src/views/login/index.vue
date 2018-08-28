@@ -11,7 +11,7 @@
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
-        <el-input name="name" type="text" v-model="loginForm.name" autoComplete="on" placeholder="用户名"
+        <el-input name="name" type="text" v-model="loginForm.name" autoComplete="on" placeholder="手机号"
         />
       </el-form-item>
       <el-form-item prop="password">
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { isvalidUsername } from '@/utils/validate'
+import { isPhone, isNotEmpty } from '@/utils/validate'
 import SocialSign from './socialsignin'
 
 export default {
@@ -39,8 +39,10 @@ export default {
   name: 'login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('请输入用户名!'))
+      if (!isNotEmpty(value)) {
+        callback(new Error('请输入手机号！'))
+      } else if (!isPhone(value)) {
+        callback(new Error('请输入正确手机号！'))
       } else {
         callback()
       }
@@ -83,11 +85,18 @@ export default {
           this.$store.dispatch('LoginByUsername', this.loginForm).then((response) => {
             this.loading = false
             this.$router.push({ path: '/' })
-          }).catch(() => {
+          }).catch((err) => {
             this.loading = false
+            this.$message({
+              message: err.m ? err.m : '登录失败！',
+              type: 'warning'
+            })
           })
         } else {
-          console.log('error submit!!')
+          this.$message({
+            message: '请确保输入信息正确！',
+            type: 'warning'
+          })
           return false
         }
       })

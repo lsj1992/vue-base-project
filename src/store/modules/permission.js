@@ -47,6 +47,7 @@ const permission = {
       return new Promise(resolve => {
         const { roles } = data
         let accessedRouters
+        // 如果是admin就让加载全部路由，暂时没有权限管理，所以都给设置为admin
         if (roles.indexOf('admin') >= 0) {
           accessedRouters = asyncRouterMap
         } else {

@@ -6,25 +6,24 @@ const path = require('path')
 
 module.exports = {
   dev: {
-
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      // '/api/': {
-      //   target: 'http://localhost:7001',
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/api/': '/api/'
-      //   }
-      // },
-      // '/errApi/': {
-      //   target: 'http://localhost:7001',
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/errApi/': '/errApi/'
-      //   }
-      // },
+      '/crm/': {
+        target: 'http://192.168.3.131:8080/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/crm/': '/crm/'
+        }
+      },
+      '/gzb/': {
+        target: 'http://192.168.3.131:8080/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/gzb/': '/gzb/'
+        }
+      },
     },
 
     // Various Dev Server settings

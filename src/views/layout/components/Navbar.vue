@@ -13,7 +13,7 @@
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
-          <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
+          <img class="user-avatar" :src="header">
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/">
@@ -36,7 +36,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
-
+import header from '@/assets/header_images/header.gif'
 export default {
   components: {
     Breadcrumb,
@@ -47,9 +47,13 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'name',
-      'avatar'
+      'name'
     ])
+  },
+  data() {
+    return {
+      header: header
+    }
   },
   methods: {
     toggleSideBar() {

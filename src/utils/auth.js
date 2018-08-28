@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'Authorization'
+const TokenKey = 'token'
+const userMsgKey = 'userMsg'
 
 const cstfToken = 'csrfToken'
 Cookies.set('test1', 'test1')
@@ -22,3 +23,18 @@ export function setToken(token) {
 export function removeToken() {
   return Cookies.remove(TokenKey)
 }
+export function getUserMsg() {
+  const userMsg = Cookies.get(userMsgKey)
+  if (userMsg) {
+    return JSON.parse(userMsg)
+  } else {
+    return {}
+  }
+}
+export function setUserMsg(userMsg) {
+  return Cookies.set(userMsgKey, JSON.stringify(userMsg))
+}
+export function removeUserMsg() {
+  return Cookies.remove(userMsgKey)
+}
+

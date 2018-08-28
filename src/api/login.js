@@ -1,12 +1,12 @@
 import request from '@/utils/request'
 
-export function loginByUsername(name, password) {
+export function loginByUsername(phone, password) {
   const data = {
-    name,
+    phone,
     password
   }
   return request({
-    url: '/login/login',
+    url: '/crm/user/login',
     method: 'post',
     data
   })
