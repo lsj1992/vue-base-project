@@ -9,13 +9,13 @@
       </el-col>
     </el-row>
     <!-- banner 列表组件 -->
-    <banner-list ref="showBanner" :imagesTableList="imagesTableList" :total="total" @editBannerRow="editBannerRow"></banner-list>
+    <banner-list :showRadio="showRadio" ref="showBanner" :imagesTableList="imagesTableList" :total="total" @editBannerRow="editBannerRow"></banner-list>
     <!-- 弹出窗口，添加和修改banner详细信息 -->
     <el-dialog class="add_code_table" :title="dialogTit" :fullscreen="fullscreen" :visible.sync="dialogFormVisible">
       <!-- 增加表单验证  -->
       <el-form class="add_code_form" label-position="cener"  label-width="100px" :rules="validateBanner" :model="detailBannerData">
-        <el-form-item prop="configName" label="轮播图片id" v-show="showStatus">
-          <el-input  name="configName" v-model="detailBannerData.bannerPicId" :disabled="disabled">
+        <el-form-item prop="configName" label="轮播图片id" v-if="showStatus">
+          <el-input  name="configName" v-model="detailBannerData.bannerPicId" disabled>
           </el-input>
         </el-form-item>
         <el-form-item label="类型">
@@ -32,13 +32,18 @@
             <el-option label="3" value="3"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="可用banner">
           <template>
-            <banner-list :showRadio="showRadio" ref="editOrAddBanner" :imagesTableList="imagesTableList" :total="total" @editBannerRow="editBannerRow"></banner-list>
+            <banner-list :showRadio="dialogShowRadio" :showOperation="showOperation" ref="showBanner" :imagesTableList="dialogImagesTableList" :total="total" @editBannerRow="editBannerRow"></banner-list>
           </template>
         </el-form-item>
         <el-form-item label="描述">
-          <el-input placeholder="请输banner描述" v-model="detailBannerData.bannerDesc" :disabled="disabled">
+          <el-input 
+            placeholder="请输banner描述"
+            v-model="detailBannerData.bannerDesc"
+            type="textarea"
+            :autosize="{minRows:3}"
+            :disabled="disabled">
           </el-input>
         </el-form-item>
       </el-form>
@@ -52,7 +57,7 @@
   </div>
 </template>
 <script>
-import { getBannerList, showBannerById } from '@/api/gzb_banner'
+import * as bannerApi from '@/api/gzb_banner'
 import bannerList from './component/bannerList'
 export default {
   components: {
@@ -62,6 +67,7 @@ export default {
   data() {
     return {
       imagesTableList: [],
+      dialogImagesTableList: [],
       total: 0,
       pageSize: 10, // 可有可无，可通过props传递到子组件
       pageSizes: [10, 20, 30, 40, 50], // 可有可无，可通过props传递到子组件
@@ -73,7 +79,10 @@ export default {
       fullscreen: true, // 用来控制弹窗全屏
       validateBanner: {}, // 用来做表单验证
       showStatus: true, // 用来控制，bannerid表单是否显示
-      showRadio: true // 用来控制bannerlist中单选框的显示隐藏
+      dialogShowRadio: true, // 用来控制弹窗中的bannerlist中单选框的显示隐藏
+      showRadio: false, // 用来控制bannerlist中单选框的显示隐藏
+      showOperation: false, // 用来控制 弹窗中 bannerlist中 操作列 的显示隐藏
+      isAddBanner: false // 用来控制 弹窗中 bannerlist 是否显示
     }
   },
   filters: {},
@@ -89,7 +98,7 @@ export default {
      */
     getBannerList() {
       const _this = this
-      getBannerList().then(function(response) {
+      bannerApi.getBannerList().then(function(response) {
         const res = response.data
         if (res.code === '000000') {
           _this.imagesTableList = res.data
@@ -101,23 +110,35 @@ export default {
      * 点击添加按钮添加banner
      */
     addBanner() {
-
+      const _this = this
+      _this.dialogFormVisible = true
+      _this.showStatus = false
+      _this.dialogTit = '添加轮播图'
+      bannerApi.showBannerById().then(function(response) {
+        const res = response.data
+        if (res.code === '000000') {
+          _this.dialogImagesTableList = res.data.bannerList
+          _this.detailBannerData = {}
+          console.log(res.data)
+        }
+      })
     },
     /**
      * 点击编辑修改当前banner信息
      */
     editBannerRow(row) {
       const _this = this
-      console.log('编辑')
       _this.dialogFormVisible = true
+      _this.showStatus = true
       _this.dialogTit = '编辑轮播图'
-      showBannerById().then(function(response) {
+      console.log(_this.dialogTit)
+      bannerApi.showBannerById().then(function(response) {
         const res = response.data
         if (res.code === '000000') {
           _this.detailBannerData = res.data
-          console.log(res)
+          _this.dialogImagesTableList = res.data.bannerList
+          console.log(_this.detailBannerData)
         }
-        console.log(response.data)
       })
     },
     /**

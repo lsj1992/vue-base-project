@@ -3,6 +3,7 @@ import loginAPI from './login'
 import errorApi from './error'
 import gzbCodeTable from './gzbCodeTable'
 import gzbBanner from './gzbBanner'
+import gzbFlow from './gzbFlow'
 
 // 登录相关
 Mock.mock(/\/login\/login/, 'post', loginAPI.loginByUsername)
@@ -33,5 +34,14 @@ Mock.mock(/\/crm\/configCode\/addCode/, 'post', gzbCodeTable.addCodeValue)
 Mock.mock(/\/crm\/banner\/showBannerById/, 'post', gzbBanner.showBannerById)
 // 获取banner列表
 Mock.mock(/\/crm\/banner\/showBanner/, 'post', gzbBanner.getBannerList)
+// 获取图片列表
+Mock.mock(/\/crm\/bannerPic\/showPicture/, 'post', gzbBanner.showPicture)
+// 工作流
+// 获取班组列表
+Mock.mock(/\/crm\/groupMember\/groupList/, 'post', gzbFlow.getGroupList)
+// 根据班组id获取工作流列表
+Mock.mock(/\/crm\/flowRole\/query/, 'post', gzbFlow.getQuery)
+// 获取工作流列表
+Mock.mock(/\/crm\/flow\/flowList/, 'post', gzbFlow.getFlowList)
 
 export default Mock

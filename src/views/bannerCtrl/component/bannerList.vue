@@ -9,7 +9,7 @@
       <el-table-column
         label="选择"
         align="center"
-        v-show="showRadio"
+        v-if="showRadio"
         style="width: 20%;">
         <template slot-scope="scope">
           <el-radio class="radio" v-model="selectedBanner" :label="scope.row.id"></el-radio>
@@ -50,10 +50,11 @@
       <el-table-column
         label="操作"
         align="center"
+        v-if="showOperation"
         style="width: 35%">
         <template slot-scope="scope">
           <el-button @click="editBanner(scope.row)" type="primary" size="small">编辑</el-button>
-          <el-button @click="deleteConfim('codeTable', scope.row)" type="primary" size="small">删除</el-button>
+          <el-button @click="deleteConfim('codeTable', scope.row)" type="danger" size="small">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,6 +83,10 @@ export default {
     showRadio: {
       type: Boolean,
       default: false
+    },
+    showOperation: {
+      type: Boolean,
+      default: true
     },
     total: {
       type: Number,
