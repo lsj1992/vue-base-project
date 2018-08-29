@@ -42,6 +42,6 @@ Mock.mock(/\/crm\/groupMember\/groupList/, 'post', gzbFlow.getGroupList)
 // 根据班组id获取工作流列表
 Mock.mock(/\/crm\/flowRole\/query/, 'post', gzbFlow.getQuery)
 // 获取工作流列表
-Mock.mock(/\/crm\/flow\/flowList/, 'post', gzbFlow.getFlowList)
+// Mock.mock(/\/crm\/flow\/flowList/, 'post', gzbFlow.getFlowList)
 
 export default Mock

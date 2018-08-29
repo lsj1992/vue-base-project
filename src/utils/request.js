@@ -96,5 +96,7 @@ service.interceptors.response.use(
     })
     return Promise.reject(error)
   })
-
+export const http = axios
+// console.log(axios.all)
 export default service
+
