@@ -144,14 +144,14 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-        <!-- 码值列表 开始-->
+        <!-- 码值列表 结束-->
       </el-form>
       <!-- 列表 底部 开始-->
       <div slot="footer" v-show="showStatus" class="dialog_footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="addOrEditCodeTable">确 定</el-button>
       </div>
-      <!-- 列表 底部 开始-->
+      <!-- 列表 底部 结束-->
     </el-dialog>
   </div>
 </template>

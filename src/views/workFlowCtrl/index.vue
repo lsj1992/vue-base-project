@@ -56,9 +56,9 @@
         align="center"
         style="width: 25%">
           <template slot-scope="scope">
-            {{scope.row.isAvailable === 0 ? '启用' : '禁用'}}
+            {{scope.row.flowStatus === 0 ? '启用' : '禁用'}}
             <!-- <el-switch
-              v-model="scope.row.isAvailable"
+              v-model="scope.row.flowStatus"
               active-text="启用"
               inactive-text="禁用"
               @change="changeFlowStatus(scope.row)"
@@ -95,9 +95,16 @@
       <!-- 增加表单验证  -->
       <el-form class="add_image_form" :model="detailFlowData">
         <el-form-item>
-          <el-input name="configName" v-model="detailFlowData.flowName">
+          <el-input name="configName" style="width: 40%; margin-right: 25px;" v-model="detailFlowData.flowName">
             <template slot="prepend">工作流名称</template>
           </el-input>
+           <el-switch
+              v-model="flowStatus"
+              active-text="启用"
+              inactive-text="禁用"
+              @change="changeFlowStatus()"
+              >
+            </el-switch>
         </el-form-item>
         <el-form-item class="flow_desc" label="工作流描述">
           <el-input
@@ -129,7 +136,7 @@
             align="center"
             width="250">
               <template slot-scope="scope">
-              <el-select v-model="scope.row.sumRoleid" placeholder="请选择">
+              <el-select v-model="scope.row.flowRoleId" placeholder="请选择">
                 <el-option
                   v-for="item in RoleList"
                   :key="item.sumRoleId"
@@ -144,7 +151,7 @@
             align="center"
             width="200">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.SMS" placeholder="请选择">
+              <el-select v-model="scope.row.remindId" placeholder="请选择">
                 <el-option
                   v-for="item in noticeType"
                   :key="item.codeValue"
@@ -174,12 +181,12 @@
             align="center"
             width="250">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.remindId" placeholder="请选择">
+              <el-select v-model="scope.row.thirdFunctionId" placeholder="请选择">
               <el-option
                 v-for="item in thirdpartyApp"
-                :key="item.id"
+                :key="item.codeValue"
                 :label="item.codeName"
-                :value="item.id">
+                :value="item.codeValue">
               </el-option>
             </el-select>
             </template>
@@ -235,12 +242,18 @@
             align="center"
             width="100">
             <template slot-scope="scope">
-             <el-button @click="deletStep" type="danger" size="small">删除</el-button>
+             <el-button @click="deletStep(scope.row)" type="danger" size="small">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
         </el-form-item>
       </el-form>
+      <!-- 列表 底部 开始-->
+      <div slot="footer" class="dialog_footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addOrEditCodeTable">确 定</el-button>
+      </div>
+      <!-- 列表 底部 结束-->
     </el-dialog>
   </div>
 </template>
@@ -280,7 +293,8 @@ export default {
         remindId: '', // SMS 短信， email  email
         sumRoleId: 0, // 班组id
         sumRoleName: '', // 班组名称
-        thirdFunctionId: '' // TAX BUREAU 税务局 POSTAL_BANK 邮储银行
+        thirdFunctionId: '', // TAX BUREAU 税务局 POSTAL_BANK 邮储银行
+        isSelfAdd: true // 用来区分是自己添加的还是服务端获取的
       },
       whereabouts: 0,
       weatTime: [
@@ -351,7 +365,15 @@ export default {
     }
   },
   computed: {
-
+    flowStatus: {
+      get() {
+        return this.detailFlowData.flowStatus === 0
+      },
+      set(val) {
+        this.detailFlowData.flowStatus = val === true ? 0 : 1
+        console.log(this.detailFlowData.flowStatus)
+      }
+    }
   },
   created() {
     this.getFlowList()
@@ -473,6 +495,9 @@ export default {
         })
       }
     },
+    /**
+     * 给table加上rowIndex
+     */
     tableRowClassName(currentData) {
       currentData.row.rowIndex = currentData.rowIndex + 1
     },
@@ -480,13 +505,26 @@ export default {
      * 删除步骤
      */
     deletStep(row) {
-      console.log(row)
+      if (this.detailFlowStep.length <= 1) {
+        this.$message({
+          type: 'warning',
+          message: '至少保留一个步骤'
+        })
+        return false
+      }
+      this.$confirm('此操作将删除该步骤, 是否继续?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 这里只是从页面上删除了改步骤，要想真正修改改步骤，需要点击页面下面的弹窗
+        this.detailFlowStep.splice(this.detailFlowStep.findIndex(item => item.id === row.rowIndex - 1), 1)
+      })
     },
     /**
      * 增加步骤
      */
     addEmptStep() {
-      this.detailFlowStep = []
       this.detailFlowStep.push(Object.assign({}, this.getGzb01TFlow))
     },
     /**
@@ -495,32 +533,9 @@ export default {
     addOrEditFlow(addOrEdit, row) {
       // /crm/configCode/queryCode  返回短信，邮件等通知形式
       this.dialogFormVisible = true
-      const getGzb01TFlow = [{
-        duration: 10, // 等待周期
-        flowId: 156,
-        flowOrder: 1,
-        flowRoleId: 5,
-        isApproval: 0, // 是否添加组件 0 是 1 否
-        isAttach: 0, // 是否需要审批
-        remindId: 'SMS', // SMS 短信， email  email
-        sumRoleId: 5, // 班组id
-        sumRoleName: '班组组长', // 班组名称
-        thirdFunctionId: 'TAX BUREAU', // TAX BUREAU 税务局 POSTAL_BANK 邮储银行
-        whereabouts: 0
-      }]
-      const getFlowDetail = {
-        adminId: 0,
-        count: 1,
-        createTime: '2018-08-21 17:31:26',
-        discrible: '添加测试',
-        flowName: '添加测试',
-        flowStatus: 0,
-        flowType: 0,
-        id: 156,
-        startTime: '2018-08-21 17:31:26'
-      }
       if (addOrEdit === 'add') {
         this.detailFlowData = {}
+        this.detailFlowStep = []
         this.detailFlowStep.push(Object.assign({}, this.getGzb01TFlow))
         const queryList = [
           {}, // 获取班组负责人列表 不需要参数
@@ -535,23 +550,90 @@ export default {
             pageSize: 40
           }]
         gzbFlow.getQueryCode(queryList).then(http.spread((RoleList, noticeType, thirdpartyApp) => {
-          this.RoleList = RoleList.data.d
-          this.noticeType = noticeType.data.d
-          this.thirdpartyApp = thirdpartyApp.data.d
-          console.log(this.RoleList)
-          console.log(this.noticeType)
-          console.log(this.thirdpartyApp)
+          this.$set(this, 'RoleList', RoleList.data.d)
+          this.$set(this, 'noticeType', noticeType.data.d)
+          this.$set(this, 'thirdpartyApp', thirdpartyApp.data.d)
         }))
       } else if (addOrEdit === 'edit') {
-        this.detailFlowData = getFlowDetail
-        this.detailFlowStep = getGzb01TFlow
+        gzbFlow.getAllFlowDetail([{}, { id: row.id }]).then(http.spread((RoleList, flowDetail) => {
+          this.$set(this, 'RoleList', RoleList.data.d)
+          this.detailFlowData = flowDetail.data.d.getGzb01TFlow
+          this.detailFlowStep = flowDetail.data.d.getFlowDetail
+        }))
       }
     },
     /**
-     * 改变 某工作流启用禁用状态
+     * 点击确定 添加或者修改工作流
      */
-    changeFlowStatus(row) {
-      console.log(row)
+    addOrEditCodeTable() {
+      const stepDatas = []
+      let stepData = {}
+      this.detailFlowStep.forEach(item => {
+        stepData = {
+          'flowOrder': item.rowIndex - 1,
+          'flowRoleId': item.flowRoleId,
+          'remindId': item.remindId,
+          'duration': item.duration,
+          'thirdFunctionId': item.thirdFunctionId,
+          'whereabouts': item.whereabouts,
+          'isApproval': item.isApproval,
+          'isAttach': item.isAttach
+        }
+      })
+      stepDatas.push(stepData)
+      const submitData = {
+        id: this.detailFlowData.id ? this.detailFlowData.id : 0, // id 的默认值
+        flowName: this.detailFlowData.flowName,
+        discrible: this.detailFlowData.discrible,
+        flowStatus: this.flowStatus ? 0 : 1, // 状态的默认值
+        gzb01TFlowDetailListStr: JSON.stringify(stepDatas)
+      }
+      gzbFlow.updateFlowDetailList(submitData).then((response) => {
+        console.log(response)
+        const res = response.data
+        if (res.e === '000000') {
+          this.$message({
+            message: res.m ? res.m : '工作流修改成功',
+            type: 'success'
+          })
+          this.dialogFormVisible = false
+          // 这里找到 工作流列表中对应的行，将值改变为修改后的状态
+          const index = this.flowList.findIndex(item => item.id === submitData.id)
+          if (index !== -1) {
+            this.flowList[index].flowName = submitData.flowName
+            this.flowList[index].discrible = submitData.discrible
+            this.flowList[index].flowStatus = submitData.flowStatus
+            this.flowList[index].count = stepDatas.length
+          }
+        } else if (res.e === '1000015') {
+          this.$message({
+            message: res.m ? res.m : '工作流修改失败',
+            type: 'warning'
+          })
+          this.$nextTick().then(() => {
+            this.$store.dispatch('FedLogOut').then(() => {
+              this.$router.push({ path: '/login' })
+            })
+          })
+        } else {
+          this.$message({
+            message: res.m ? res.m : '工作流修改失败',
+            type: 'warning'
+          })
+        }
+      }).catch((err) => {
+        this.$message({
+          message: err.m ? err.m : '工作流修改失败',
+          type: 'error'
+        })
+      })
+      // console.log(submitData)
+    },
+    /**
+     * 改变 某工作流启用禁用状态, 由于v-model无法使用过滤器，则通过computed实现
+     */
+    changeFlowStatus() {
+      this.flowStatus = !this.detailFlowData.flowStatus
     },
     /**
      * 切换每页显示条数
@@ -605,5 +687,8 @@ export default {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   margin-bottom: 20px;
+}
+.dialog_footer {
+  text-align: center;
 }
 </style>

@@ -69,24 +69,6 @@ export function getSingleQueryCode(data) {
  * @param {Array} data ['NOTICE_TYPE', 'THIRDPARTY_APP']
  */
 export function getQueryCode(data) {
-  // const queryList = []
-  // // const resultDataName = []
-  // for (const configValue of data) {
-  //   const d = {
-  //     configValue: configValue
-  //   }
-  //   console.log(d)
-  //   queryList.push(getSingleQueryCode(d))
-  // }
-  // queryList.unshift(getGzbSumRoleList())
-  // return request({
-  //   url: '/crm/sumRole/getGzbSumRoleList',
-  //   method: 'post',
-  //   data
-  // })
-  // return request.post('/crm/sumRole/getGzbSumRoleList')
-  // , getSingleQueryCode(data[1]), getSingleQueryCode(data[2])
-
   return http.all([
     getGzbSumRoleList(data[0]),
     getSingleQueryCode(data[1]),
@@ -102,5 +84,34 @@ export function getGzbSumRoleList(data) {
     method: 'post',
     data
   })
+}
+/**
+ * 添加或者编辑工作流
+ */
+export function updateFlowDetailList(data) {
+  return request({
+    url: '/crm/flowdetail/updateFlowDetailList',
+    method: 'post',
+    data
+  })
+}
+/**
+ * 获取工作流详情
+ */
+export function getFlowDetail(data) {
+  return request({
+    url: '/crm/flowdetail/getFlowDetail',
+    method: 'post',
+    data
+  })
+}
+/**
+ * 获取工作流详情
+ */
+export function getAllFlowDetail(data) {
+  return http.all([
+    getGzbSumRoleList(data[0]),
+    getFlowDetail(data[1])
+  ])
 }
 
