@@ -6,7 +6,7 @@ import request, { http } from '@/utils/request'
  * 获取班组列表
  * /crm/groupMember/groupList
  */
-export function getGroupList(isCodeTable, data) {
+export function getGroupList(data) {
   return request({
     url: '/crm/groupMember/groupList',
     method: 'post',
@@ -39,6 +39,22 @@ export function getQuery(data) {
 export function getFlowList(data) {
   return request({
     url: '/crm/flow/flowList',
+    method: 'post',
+    data
+  })
+}
+/**
+ * 更改工作流启用禁用状态
+ * @param {Object} data {
+ *  allotId: 218,
+ *  allotType: 0,
+ *  flowId: 162,
+ *  isAvailable: 0
+ * }
+ */
+export function updateStatus(data) {
+  return request({
+    url: '/crm/flowRole/update',
     method: 'post',
     data
   })
@@ -111,7 +127,8 @@ export function getFlowDetail(data) {
 export function getAllFlowDetail(data) {
   return http.all([
     getGzbSumRoleList(data[0]),
-    getFlowDetail(data[1])
+    getSingleQueryCode(data[1]),
+    getSingleQueryCode(data[2]),
+    getFlowDetail(data[3])
   ])
 }
-

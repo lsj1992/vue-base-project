@@ -351,18 +351,6 @@ export default {
     }
   },
   filters: {
-    whereabouts(id) {
-      // 0 通知给创建者
-      // 1 通知给上一级
-      // 2 给上面所有人通知
-      if (id === 0) {
-        return '通知给创建者'
-      } else if (id === 1) {
-        return '通知给上一级'
-      } else if (id === 2) {
-        return '给上面所有人通知'
-      }
-    }
   },
   computed: {
     flowStatus: {
@@ -533,32 +521,35 @@ export default {
     addOrEditFlow(addOrEdit, row) {
       // /crm/configCode/queryCode  返回短信，邮件等通知形式
       this.dialogFormVisible = true
+      const queryList = [
+        {}, // 获取班组负责人列表 不需要参数
+        {
+          configValue: 'NOTICE_TYPE',
+          page: 1,
+          pageSize: 40
+        },
+        {
+          configValue: 'THIRDPARTY_APP',
+          page: 1,
+          pageSize: 40
+        }]
       if (addOrEdit === 'add') {
         this.detailFlowData = {}
         this.detailFlowStep = []
         this.detailFlowStep.push(Object.assign({}, this.getGzb01TFlow))
-        const queryList = [
-          {}, // 获取班组负责人列表 不需要参数
-          {
-            configValue: 'NOTICE_TYPE',
-            page: 1,
-            pageSize: 40
-          },
-          {
-            configValue: 'THIRDPARTY_APP',
-            page: 1,
-            pageSize: 40
-          }]
         gzbFlow.getQueryCode(queryList).then(http.spread((RoleList, noticeType, thirdpartyApp) => {
           this.$set(this, 'RoleList', RoleList.data.d)
           this.$set(this, 'noticeType', noticeType.data.d)
           this.$set(this, 'thirdpartyApp', thirdpartyApp.data.d)
         }))
       } else if (addOrEdit === 'edit') {
-        gzbFlow.getAllFlowDetail([{}, { id: row.id }]).then(http.spread((RoleList, flowDetail) => {
+        queryList.push({ id: row.id })
+        gzbFlow.getAllFlowDetail(queryList).then(http.spread((RoleList, noticeType, thirdpartyApp, flowDetail) => {
           this.$set(this, 'RoleList', RoleList.data.d)
+          this.$set(this, 'noticeType', noticeType.data.d)
           this.detailFlowData = flowDetail.data.d.getGzb01TFlow
           this.detailFlowStep = flowDetail.data.d.getFlowDetail
+          this.$set(this, 'thirdpartyApp', thirdpartyApp.data.d)
         }))
       }
     },

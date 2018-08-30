@@ -11,7 +11,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/crm/': {
-        target: 'http://192.168.3.131:8080/',
+        // target: 'http://192.168.3.131:8080/',
+        target: 'http://139.198.17.237/',
         changeOrigin: true,
         pathRewrite: {
           '^/crm/': '/crm/'
