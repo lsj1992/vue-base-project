@@ -2,7 +2,7 @@ import Mock from 'mockjs'
 import loginAPI from './login'
 import errorApi from './error'
 import gzbCodeTable from './gzbCodeTable'
-import gzbBanner from './gzbBanner'
+// import gzbBanner from './gzbBanner'
 // import gzbFlow from './gzbFlow'
 
 // 登录相关
@@ -31,11 +31,11 @@ Mock.mock(/\/crm\/configCode\/addConfig/, 'post', gzbCodeTable.addCodeTable)
 Mock.mock(/\/crm\/configCode\/addCode/, 'post', gzbCodeTable.addCodeValue)
 
 // 根据id获取到banner信息【注意和下面获取banner列表的顺序不能换】
-Mock.mock(/\/crm\/banner\/showBannerById/, 'post', gzbBanner.showBannerById)
+// Mock.mock(/\/crm\/banner\/showBannerById/, 'post', gzbBanner.showBannerById)
 // 获取banner列表
-Mock.mock(/\/crm\/banner\/showBanner/, 'post', gzbBanner.getBannerList)
+// Mock.mock(/\/crm\/banner\/showBanner/, 'post', gzbBanner.getBannerList)
 // 获取图片列表
-Mock.mock(/\/crm\/bannerPic\/showPicture/, 'post', gzbBanner.showPicture)
+// Mock.mock(/\/crm\/bannerPic\/showPicture/, 'post', gzbBanner.showPicture)
 // 工作流
 // 获取班组列表
 // Mock.mock(/\/crm\/groupMember\/groupList/, 'post', gzbFlow.getGroupList)

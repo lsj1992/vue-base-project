@@ -9,7 +9,16 @@
       </el-col>
     </el-row>
     <!-- banner 列表组件 -->
-    <banner-list :showRadio="showRadio" ref="showBanner" :imagesTableList="imagesTableList" :total="total" @editBannerRow="editBannerRow"></banner-list>
+    <banner-list
+      :showRadio="showRadio"
+      ref="showBanner"
+      :imagesTableList="imagesTableList"
+      :total="total"
+      :currentPage="currentPage"
+      :pageSizes="pageSizes"
+      :pageSize="pageSize"
+      @editBannerRow="editBannerRow">
+    </banner-list>
     <!-- 弹出窗口，添加和修改banner详细信息 -->
     <el-dialog class="add_code_table" :title="dialogTit" :fullscreen="fullscreen" :visible.sync="dialogFormVisible">
       <!-- 增加表单验证  -->
@@ -34,7 +43,19 @@
         </el-form-item>
         <el-form-item label="可用banner">
           <template>
-            <banner-list :showRadio="dialogShowRadio" :showOperation="showOperation" ref="showBanner" :imagesTableList="dialogImagesTableList" :total="total" @editBannerRow="editBannerRow"></banner-list>
+            <banner-list
+              v-if="showDialogImgList"
+              :total="dialogTotal"
+              :currentPage="dialogCurrentPage"
+              :pageSizes="dialogPageSizes"
+              :pageSize="dialogPageSize"
+              :showRadio="dialogShowRadio"
+              :showOperation="showOperation"
+              ref="showBanner"
+              :imagesTableList="dialogImagesTableList"
+              @editBannerRow="editBannerRow">
+              </banner-list>
+            <el-input v-else v-model="detailBannerData.bannerUrl" :disabled="disabled"></el-input>
           </template>
         </el-form-item>
         <el-form-item label="描述">
@@ -50,7 +71,7 @@
       <!-- 列表 底部 开始-->
       <div slot="footer" class="dialog_footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button @click="shureAddBanner" type="primary">确 定</el-button>
       </div>
       <!-- 列表 底部 开始-->
     </el-dialog>
@@ -59,6 +80,7 @@
 <script>
 import * as bannerApi from '@/api/gzb_banner'
 import bannerList from './component/bannerList'
+import { mapGetters } from 'vuex'
 export default {
   components: {
     bannerList
@@ -67,12 +89,21 @@ export default {
   data() {
     return {
       imagesTableList: [],
-      dialogImagesTableList: [],
       total: 0,
       pageSize: 10, // 可有可无，可通过props传递到子组件
       pageSizes: [10, 20, 30, 40, 50], // 可有可无，可通过props传递到子组件
       currentPage: 1, // 可有可无，可通过props传递到子组件
-      detailBannerData: {}, // banner 的详细信息
+      dialogImagesTableList: [],
+      dialogTotal: 0,
+      dialogPageSize: 10, // 可有可无，可通过props传递到子组件
+      dialogPageSizes: [10, 20, 30, 40, 50], // 可有可无，可通过props传递到子组件
+      dialogCurrentPage: 1, // 可有可无，可通过props传递到子组件
+      detailBannerData: {
+        bannerPicId: undefined,
+        bannerType: undefined,
+        bannerIndex: undefined,
+        bannerDesc: ''
+      }, // banner 的详细信息
       dialogFormVisible: false, // 弹窗的展示隐藏
       disabled: false, // input 是否可用
       dialogTit: '添加轮播图', // 用来显示弹窗标题
@@ -82,44 +113,97 @@ export default {
       dialogShowRadio: true, // 用来控制弹窗中的bannerlist中单选框的显示隐藏
       showRadio: false, // 用来控制bannerlist中单选框的显示隐藏
       showOperation: false, // 用来控制 弹窗中 bannerlist中 操作列 的显示隐藏
-      isAddBanner: false // 用来控制 弹窗中 bannerlist 是否显示
+      isAddBanner: false, // 用来控制 弹窗中 bannerlist 是否显示
+      showDialogImgList: false // 用来控制弹窗中，图片列表是否显示
     }
   },
   filters: {},
   computed: {
-
+    ...mapGetters('banner', ['getSelectedBanner'])
   },
   created() {
-    this.getBannerList()
+    this.getBannerList(false)
   },
   methods: {
     /**
      * 获取banner列表
      */
-    getBannerList() {
-      const _this = this
-      bannerApi.getBannerList().then(function(response) {
+    getBannerList(isDilog) {
+      const data = {
+        page: isDilog ? this.dialogCurrentPage : this.currentPage,
+        pageSize: isDilog ? this.dialogPageSize : this.pageSize
+      }
+      bannerApi.getBannerList(data).then((response) => {
         const res = response.data
         if (res.code === '000000') {
-          _this.imagesTableList = res.data
-          _this.total = res.count
+          if (isDilog) {
+            this.dialogImagesTableList = res.data
+            this.dialogTotal = res.count
+          } else {
+            this.imagesTableList = res.data
+            this.total = res.count
+          }
+        } else if (res.e === '1000015') {
+          this.$message({
+            message: res.m ? res.m : '获取轮播列表失败！',
+            type: 'warning'
+          })
+          this.$nextTick().then(() => {
+            this.$store.dispatch('FedLogOut').then(() => {
+              this.$router.push({ path: '/login' })
+            })
+          })
         }
+      }).catch((err) => {
+        this.$message({
+          message: err.m ? err.m : '获取轮播列表失败！',
+          type: 'error'
+        })
       })
     },
     /**
-     * 点击添加按钮添加banner
+     * 点击添加按钮弹出添加banner对话框
      */
     addBanner() {
-      const _this = this
-      _this.dialogFormVisible = true
-      _this.showStatus = false
-      _this.dialogTit = '添加轮播图'
-      bannerApi.showBannerById().then(function(response) {
+      this.getBannerList(true)
+      this.showDialogImgList = true
+      this.dialogFormVisible = true
+      this.showStatus = false
+      this.dialogTit = '添加轮播图'
+    },
+    /**
+     * 确认按钮 确认添加banner
+     */
+    shureAddBanner() {
+      // this.dialogImagesTableList.findIndex(item => item.id === this.getSelectedBanner)
+      const index = this.dialogImagesTableList.findIndex(item => item.id === this.getSelectedBanner)
+      const data = {
+        bannerPicId: this.getSelectedBanner,
+        bannerIndex: this.detailBannerData.bannerIndex,
+        bannerDesc: this.detailBannerData.bannerDesc,
+        bannerType: this.detailBannerData.bannerType,
+        bannerUrl: this.dialogImagesTableList[index].bannerUrl
+      }
+      for (const index in data) {
+        if (data[index] === undefined || data[index] === '') {
+          this.$message({
+            message: '必填项不能为空',
+            type: 'warning'
+          })
+          return false
+        }
+      }
+      bannerApi.insertBanner(data).then(function(response) {
         const res = response.data
-        if (res.code === '000000') {
-          _this.dialogImagesTableList = res.data.bannerList
-          _this.detailBannerData = {}
-          console.log(res.data)
+        console.log(res)
+        if (res.e === '000000') {
+          this.$message({
+            message: res.m ? res.m : '添加banner成功',
+            type: 'success'
+          })
+          // _this.dialogImagesTableList = res.d.bannerList
+          // _this.detailBannerData = {}
+          console.log(res.d)
         }
       })
     },
@@ -127,17 +211,17 @@ export default {
      * 点击编辑修改当前banner信息
      */
     editBannerRow(row) {
-      const _this = this
-      _this.dialogFormVisible = true
-      _this.showStatus = true
-      _this.dialogTit = '编辑轮播图'
-      console.log(_this.dialogTit)
-      bannerApi.showBannerById().then(function(response) {
+      this.dialogFormVisible = true
+      this.showStatus = true
+      this.dialogTit = '编辑轮播图'
+      const data = {
+        bannerId: row.id
+      }
+      bannerApi.showBannerById(data).then((response) => {
         const res = response.data
-        if (res.code === '000000') {
-          _this.detailBannerData = res.data
-          _this.dialogImagesTableList = res.data.bannerList
-          console.log(_this.detailBannerData)
+        if (res.e === '000000') {
+          this.detailBannerData = res.d
+          this.showDialogImgList = false
         }
       })
     },
@@ -181,6 +265,9 @@ export default {
   color: #909399;
   border: 1px solid #dcdfe6;
   border-radius: 4px;
+}
+.dialog_footer {
+  text-align: center;
 }
 
 </style>

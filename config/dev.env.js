@@ -3,5 +3,5 @@ module.exports = {
   ENV_CONFIG: '"dev"',
   // BASE_API: '"https://api-dev"'
   BASE_API: '""',
-  UPLOAD_API: '""'
+  UPLOAD_API: '"/gzb/file/"'
 }

@@ -12,7 +12,7 @@
         v-if="showRadio"
         style="width: 20%;">
         <template slot-scope="scope">
-          <el-radio class="radio" v-model="selectedBanner" :label="scope.row.id"></el-radio>
+          <el-radio class="radio" v-model="changeSelect" :label="scope.row.id"></el-radio>
         </template>
       </el-table-column>
       <el-table-column
@@ -20,7 +20,7 @@
         align="center"
         style="width: 20%;">
         <template slot-scope="scope">
-          <img class="banner_thumbnail" :src="scope.row.bannerUrl" preview="0" :preview-text="scope.row.bannerDesc" alt="">
+          <img class="banner_thumbnail" :src="imgBaseUrl + scope.row.bannerUrl" preview="0" :preview-text="scope.row.bannerDesc" alt="">
         </template>
       </el-table-column>
       <el-table-column
@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'BannerList',
   props: {
@@ -107,9 +108,13 @@ export default {
       default: 1
     }
   },
+  computed: {
+    ...mapGetters('banner', ['getSelectedBanner'])
+  },
   data() {
     return {
-      selectedBanner: ''
+      changeSelect: '',
+      imgBaseUrl: process.env.UPLOAD_API
     }
   },
   mounted() {
@@ -117,6 +122,9 @@ export default {
   beforeDestroy() {
   },
   methods: {
+    ...mapMutations('banner', [
+      'SET_SELECTED_BANNER'
+    ]),
     editBanner(row) {
       this.$emit('editBannerRow', row)
     },
@@ -133,6 +141,12 @@ export default {
     handleCurrentChange(val) {
       // this.getConfigCodeList()
       console.log(`当前页 跳转: ${val}`)
+    }
+  },
+  watch: {
+    changeSelect(newVal) {
+      console.log(newVal)
+      this.SET_SELECTED_BANNER(newVal)
     }
   }
 
