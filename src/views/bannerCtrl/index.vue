@@ -311,6 +311,7 @@ export default {
           const res = response.data
           if (res.e === '000000') {
             this.imagesTableList.splice(this.imagesTableList.findIndex(item => item.id === row.id), 1)
+            this.total--
             this.$message({
               type: 'success',
               message: '删除成功!'
