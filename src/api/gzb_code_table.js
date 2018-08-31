@@ -30,7 +30,6 @@ export function getCodeValueList(data) {
 
 /**
  *  删除码表
- * /crm/configCode/deleteConfig
  * 参数 id
  * 返回参数{"d": 1,"e": "000000","m": "码表删除成功"}
  * e 1成功，0失败
@@ -79,10 +78,34 @@ export function delCodeValue(data) {
 export function addOrEditCodeTable(isCodeTable, data) {
   let url = ''
   if (isCodeTable === true) {
-    url = '/crm/configCode/addCode'
+    url = '/crm/configCode/addConfig_Code2'
   } else {
-    url = '/crm/configCode/addCode'
+    url = '/crm/configCode/updateConfig_Code2'
   }
+  return request({
+    url: url,
+    method: 'post',
+    data
+  })
+}
+/**
+ * 增加码表和码值
+ *
+ */
+export function addConfig_Code2(data) {
+  const url = 'crm/configCode/addConfig_Code2'
+  return request({
+    url: url,
+    method: 'post',
+    data
+  })
+}
+/**
+ * 更新码表和码值
+ *
+ */
+export function updateConfig_Code2(data) {
+  const url = '/crm/configCode/updateConfig_Code2'
   return request({
     url: url,
     method: 'post',

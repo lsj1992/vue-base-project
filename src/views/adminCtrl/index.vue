@@ -119,6 +119,9 @@ export default {
     delFlow(row) {
       console.log(row)
     },
+    roleTable() {
+
+    },
     /**
     * 确认 增加/编辑，码表、 码值
     * */
