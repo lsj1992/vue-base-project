@@ -8,7 +8,7 @@
               <el-button type="primary" @click="roleTable('add')" plain>添加</el-button>
             </el-col>
             <el-col :md='8' :xs="10" :sm="10">
-              <el-input placeholder="请输入内容" size='medium' v-model="searchRole" class="input-with-select">
+              <el-input placeholder="请输入内容" size='medium' v-model="searchRole" class="search_input">
                 <el-button slot="append" icon="el-icon-search" @click="searchRoleTable"></el-button>
               </el-input>
             </el-col>
@@ -23,19 +23,27 @@
       :data="adminTableList"
       border
       style="width: 100%">
+      <el-table-column align="center" type="selection" width="60">
+      </el-table-column>
       <el-table-column label="角色名称" align="center" style="width: 20%;">
         <template slot-scope="scope">
           <el-input type="hidden" v-model="scope.row.id"> </el-input>
           {{scope.row.sumRoleName}}
         </template>
       </el-table-column>
-      <el-table-column  prop="sumRoleDesc" label="角色描述" align="center" style="width: 20%">
+      <el-table-column prop="sumRoleDesc" label="角色描述" align="center" style="width: 20%">
       </el-table-column>
-      <el-table-column prop="sumRoleType" label="角色类别"  align="center" style="width: 20%">
+      <el-table-column label="角色类别"  align="center" style="width: 20%">
+        <template slot-scope="scope">
+          {{scope.row.sumRoleType === 0 ? '工作流' : '菜单'}}
+        </template>
       </el-table-column>
       <el-table-column prop="sumRoleApp" label="第三方应用"  align="center" style="width: 20%">
       </el-table-column>
-      <el-table-column prop="sumRoleStatus" label="角色状态"  align="center" style="width: 20%">
+      <el-table-column  label="角色状态"  align="center" style="width: 20%">
+        <template slot-scope="scope">
+          {{scope.row.sumRoleStatus === 0 ? '启用' : '禁用'}}
+        </template>
       </el-table-column>
       <el-table-column
         label="操作"
@@ -47,6 +55,49 @@
         </template>
       </el-table-column>
     </el-table>
+     <el-pagination
+      background
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="pageSizes"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
+    <el-dialog class="add_role_table" :title="dialogTit" :fullscreen="fullscreen" :visible.sync="dialogFormVisible">
+    <el-form class="add_role_form" :model="dialogRole">
+      <el-form-item>                 
+        <el-input style="width: 40%; margin-right: 25px;" placeholder="请输入角色名称" name="sumRoleName" v-model="dialogRole.sumRoleName">
+          <template slot="prepend">角色名称</template>
+        </el-input>
+        <el-switch
+              v-model="sumRoleStatus"
+              active-text="启用"
+              inactive-text="禁用"
+              @change="changeRoleStatus()"
+              >
+            </el-switch>
+        <!-- <el-input v-model="dialogCode.configName" :disabled="disabled" auto-complete="off"></el-input> -->
+      </el-form-item>
+      <el-form-item >
+        <el-input style="width: 40%; margin-right: 25px;" placeholder="请输入第三方应用"  v-model="dialogRole.sumRoleApp" >
+          <template slot="prepend" style="width:200px">第三方应用</template>
+        </el-input>
+      </el-form-item>
+      <el-form-item class="flow_desc" label="角色描述">
+           <el-input
+            type="textarea"
+            :autosize="{ minRows: 3}"
+            v-model="dialogRole.sumRoleDesc">
+          </el-input>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" v-show="showStatus" class="dialog_footer">
+      <el-button @click="dialogFormVisible = false">取 消</el-button>
+      <el-button type="primary" @click="addOrEditRoleTable">确 定</el-button>
+    </div>
+  </el-dialog>
   </div>
 </template>
 <script>
@@ -101,7 +152,6 @@ export default {
     tableRowClassName(currentData) {
       currentData.row.rowIndex = currentData.rowIndex
     },
-
     getSumRoleList() {
       const _this = this
       const data = {
@@ -116,16 +166,40 @@ export default {
         }
       })
     },
-    delFlow(row) {
-      console.log(row)
+    roleTable(status) {
+      const _this = this
+      _this.dialogFormVisible = true
+      _this.disabled = false
+      _this.dialogRole = {}
+      if (status === 'look') {
+        _this.getRoleValue()
+        _this.dialogTit = '查看角色'
+        _this.showStatus = false
+        _this.disabled = true
+      } else if (status === 'edit') {
+        _this.getCodeValue()
+        _this.dialogTit = '编辑角色'
+        _this.disabled = false
+        _this.showStatus = true
+        _this.isAddOrEdit = false
+      } else if (status === 'add') {
+        _this.dialogTit = '添加角色'
+        _this.dialogRole = {}
+        _this.roleValueList = []
+        _this.roleValueList.push(Object.assign({}, _this.baeeRoleVal))
+        _this.disabled = false
+        _this.showStatus = true
+        _this.isAddOrEdit = true
+      }
     },
-    /**
-    * 确认 增加/编辑，码表、 码值
-    * */
     addOrEditRoleTable() {
       const _this = this
       const data = {
-
+        sumRoleName: _this.sumRoleName,
+        sumRoleDesc: _this.sumRoleDesc,
+        sumRoleType: _this.sumRoleType,
+        sumRoleApp: _this.sumRoleApp,
+        sumRoleStatus: _this.sumRoleStatus
       }
       gzbAdmin.addOrEditRoleTable(_this.isAddOrEdit, data).then(function(response) {
         const res = response.data
@@ -150,6 +224,9 @@ export default {
       })
     }
   },
+  changeRoleStatus() {
+    this.sumRoleStatus = !this.dialogRole.sumRoleStatus
+  },
   mounted() {
   },
   destroyed() {
@@ -170,8 +247,18 @@ export default {
   box-shadow: 0px 0px 3px #808080;
   margin-bottom: 20px;
 }
-.search_input {
-  width: 30%;
-  margin-left: 30px;
+// .search_input {
+//   width: 30%;
+//   margin-left: 30px;
+// }
+.add_role_form {
+  padding: 0 50px 0 20px;
+}
+.adminCtrl >>> .el-input-group__prepend {
+  width: 100px;
+  text-align: center;
+}
+.dialog_footer {
+  text-align: center;
 }
 </style>
