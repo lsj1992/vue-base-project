@@ -20,26 +20,37 @@
         align="center"
         style="width: 20%;">
         <template slot-scope="scope">
-          <img class="banner_thumbnail" :src="imgBaseUrl + scope.row.bannerUrl" preview="0" :preview-text="scope.row.bannerDesc" alt="">
+          <img class="banner_thumbnail" :src="imgBaseUrl + scope.row.picUrl" preview="0" :preview-text="scope.row.bannerDesc" alt="">
         </template>
       </el-table-column>
       <el-table-column
-        prop="bannerIndex"
         label="序号"
         align="center"
+        v-if="!isDialog"
         style="width: 25%">
+        <template slot-scope="scope">
+          <span>{{scope.row.bannerIndex}}</span>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="bannerDesc"
         label="描述"
         align="center"
         style="width: 25%">
+        <template slot-scope="scope">
+          <span v-if="scope.row.bannerDesc">{{scope.row.bannerDesc}}</span>
+          <span v-if="scope.row.picDesc">{{scope.row.picDesc}}</span>
+        </template>
       </el-table-column>
        <el-table-column
-        prop="bannerType"
         label="类型"
         align="center"
+        v-if="!isDialog"
         style="width: 25%">
+        <template slot-scope="scope">
+          <span v-if="scope.row.bannerType === 1">主页</span>
+          <span v-if="scope.row.bannerType === 2">保险</span>
+          <span v-if="scope.row.bannerType === 3">金融</span>
+        </template>
        </el-table-column>
       <el-table-column
         prop="picUrl"
@@ -54,7 +65,7 @@
         style="width: 35%">
         <template slot-scope="scope">
           <el-button @click="editBanner(scope.row)" type="primary" size="small">编辑</el-button>
-          <el-button @click="deleteConfim('codeTable', scope.row)" type="danger" size="small">删除</el-button>
+          <el-button @click="deleteBanner(scope.row)" type="danger" size="small">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -80,6 +91,11 @@ export default {
     imagesTableList: {
       required: true,
       type: Array
+    },
+    isDialog: {
+      required: true,
+      type: Boolean,
+      default: false
     },
     showRadio: {
       type: Boolean,
@@ -114,7 +130,7 @@ export default {
   data() {
     return {
       changeSelect: '',
-      imgBaseUrl: process.env.UPLOAD_API
+      imgBaseUrl: process.env.files_href
     }
   },
   mounted() {
@@ -125,27 +141,40 @@ export default {
     ...mapMutations('banner', [
       'SET_SELECTED_BANNER'
     ]),
+    /**
+     * 编辑banner
+     */
     editBanner(row) {
       this.$emit('editBannerRow', row)
+    },
+    /**
+     * 删除banner
+     */
+    deleteBanner(row) {
+      this.$emit('deleteBanner', row)
+    },
+    /**
+     * 改变状态
+     */
+    changeRadioStatus(val) {
+      this.changeSelect = val
     },
     /**
      * 切换每页显示条数
      */
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
-      // this.getConfigCodeList()
+      this.$emit('handleSizeChange', val)
     },
     /**
      * 跳转，上一页上一页
      */
     handleCurrentChange(val) {
-      // this.getConfigCodeList()
-      console.log(`当前页 跳转: ${val}`)
+      console.log('handleCurrentChange')
+      this.$emit('handleCurrentChange', val)
     }
   },
   watch: {
     changeSelect(newVal) {
-      console.log(newVal)
       this.SET_SELECTED_BANNER(newVal)
     }
   }

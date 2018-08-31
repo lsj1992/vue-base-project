@@ -54,7 +54,7 @@
         style="width: 25%">
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.selfAddIsAvailable"
+              v-model="scope.row.isAvailable"
               active-text="启用"
               inactive-text="禁用"
               disabled
@@ -351,7 +351,7 @@ export default {
         if (res.code === '000000') {
           this.flowList = res.data
           this.flowList.map(item => {
-            item.selfAddIsAvailable = item.isAvailable === 0
+            item.isAvailable = item.isAvailable === 0
           })
           this.showFlowList = true
           this.total = res.count
@@ -390,15 +390,11 @@ export default {
      * 改变当前 班组下 某 工作流启用禁用状态
      */
     changeFlowStatus(row) {
-      // console.log(row)
-      // this.$set(this.flowList[row.rowIndex], 'selfAddIsAvailable', row.selfAddIsAvailable)
-      // this.flowList[row.rowIndex].selfAddIsAvailable = row.selfAddIsAvailable
-      // this.flowList[row.rowIndex].isAvailable = row.selfAddIsAvailable ? 0 : 1
       const data = {
         allotId: row.allotId, // 班组id
         allotType: row.allotType, // 分类匹配 0 班组 1 企业 2 项目
         flowId: row.flowId, // 工作流id
-        isAvailable: !row.selfAddIsAvailable ? 0 : 1 // 启用禁用状态
+        isAvailable: row.isAvailable ? 0 : 1 // 启用禁用状态
       }
       gzbFlow.updateStatus(data).then(response => {
         const res = response.data
@@ -407,15 +403,12 @@ export default {
             message: res.m ? res.m : '修改工作流状态成功',
             type: 'success'
           })
-          this.$set(this.flowList[row.rowIndex], 'selfAddIsAvailable', !row.selfAddIsAvailable)
-          this.flowList[row.rowIndex].isAvailable = !row.selfAddIsAvailable ? 0 : 1
         } else {
           this.$message({
             message: res.m ? res.m : '修改工作流状态失败',
             type: 'warning'
           })
-          this.flowList[row.rowIndex].isAvailable = row.selfAddIsAvailable ? 0 : 1
-          this.flowList[row.rowIndex].selfAddIsAvailable = row.selfAddIsAvailable
+          this.flowList[row.rowIndex].isAvailable = !row.isAvailable
         }
       })
     },

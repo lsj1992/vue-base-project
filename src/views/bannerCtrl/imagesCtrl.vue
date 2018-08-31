@@ -26,7 +26,7 @@
         align="center"
         style="width: 20%;">
         <template slot-scope="scope">
-          <img class="thumbnail" :src="scope.row.picImg" preview="0" :preview-text="scope.row.bannerDesc" alt="">
+          <img class="thumbnail" :src="imgBaseUrl + scope.row.picUrl" preview="0" :preview-text="scope.row.bannerDesc" alt="">
         </template>
       </el-table-column>
       <el-table-column
@@ -82,10 +82,12 @@
             :data="uploadData"
             ref="uploadImgForm"
             :action="uploadUrl"
-            :on-preview="handlePreview"
             :on-change="handChange"
             :file-list="imagesList"
             :auto-upload="false"
+            :on-success="uploadSuccess"
+            :on-error="uploadError"
+            name="picture"
             list-type="picture">
             <el-button slot="trigger" @click="emptyImagesList" size="small" type="primary">选取文件</el-button>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
@@ -111,6 +113,7 @@
 </template>
 <script>
 import * as bannerApi from '@/api/gzb_banner'
+import { mapGetters } from 'vuex'
 export default {
   components: {
   },
@@ -122,8 +125,12 @@ export default {
       pageSize: 10,
       pageSizes: [10, 20, 30, 40, 50],
       currentPage: 1,
-      uploadUrl: process.env.UPLOAD_API,
+      uploadUrl: '/crm/bannerPic/insertPicture',
+      // fileUrl: process.env.files_href,
+      imgBaseUrl: process.env.files_href,
       uploadData: {
+        filename: '',
+        token: '',
         picDesc: ''
       }, // 图片 的详细信息
       dialogFormVisible: false, // 弹窗的展示隐藏
@@ -134,7 +141,7 @@ export default {
   },
   filters: {},
   computed: {
-
+    ...mapGetters(['token'])
   },
   created() {
     this.showPicture()
@@ -144,27 +151,60 @@ export default {
      * 上传到服务器
      */
     submitUpload() {
+      this.uploadData.token = this.token
+      // this.uploadData.name = this.token
       this.$refs.uploadImgForm.submit()
     },
     /**
-     * 点击当前加载的图片时候调用
+     * 当选择的图片改变时候触发
      */
     handChange(file) {
-      console.log(file)
-      console.log(this.imagesList)
-      // this.uploadImg.imagesList.slice(-1)
+      // console.log(file)
     },
     /**
-     * 点击当前加载的图片时候调用
+     * 上传成功时调用
+     *  ⭐⭐⭐⭐⭐注意上传成功和上传失败，返回的对象结构不同，
+     */
+    uploadSuccess(res) {
+      if (res.code === '000000') {
+        this.imagesTableList = res.data
+        this.imagesTableList.forEach(item => {
+          item.picStatus = item.picStatus === 0
+          console.log(item.picStatus)
+        })
+        this.total = res.count
+        this.dialogFormVisible = false
+      } else if (res.e === '1000015') {
+        this.$message({
+          message: res.m ? res.m : '上传图片图片失败！',
+          type: 'warning'
+        })
+        this.$nextTick().then(() => {
+          this.$store.dispatch('FedLogOut').then(() => {
+            this.$router.push({ path: '/login' })
+          })
+        })
+      } else {
+        this.$message({
+          message: res.m ? res.m : '上传图片图片失败！',
+          type: 'warning'
+        })
+      }
+    },
+    /**
+     * 上传失败时调用
+     */
+    uploadError(err) {
+      this.$message({
+        message: err.m ? err.m : '上传图片图片失败！',
+        type: 'warning'
+      })
+    },
+    /**
+     * 点击选择文件时候
      */
     emptyImagesList() {
       this.imagesList = []
-    },
-    /**
-     * 点击当前加载的图片时候调用
-     */
-    handlePreview(file) {
-      console.log(file)
     },
     /**
      * 展示添加图片列表
@@ -180,37 +220,95 @@ export default {
      * 获取图片列表
      */
     showPicture() {
-      const _this = this
-      bannerApi.showPicture().then(function(response) {
+      const data = {
+        page: this.currentPage,
+        pageSize: this.pageSize
+      }
+      bannerApi.showPicture(data).then((response) => {
         const res = response.data
-        _this.imagesTableList = res.data
-        _this.total = res.count
-        // _this.imagesTableList.map((item, index, self) => {
-        //   console.log('index' + index)
-        //   console.log(item.picStatus)
-        // })
+        if (res.code === '000000') {
+          this.imagesTableList = res.data
+          this.imagesTableList.forEach(item => {
+            item.picStatus = item.picStatus === 0
+            console.log(item.picStatus)
+          })
+          this.total = res.count
+        } else if (res.e === '1000015') {
+          this.$message({
+            message: res.m ? res.m : '获取图片列表失败！',
+            type: 'warning'
+          })
+          this.$nextTick().then(() => {
+            this.$store.dispatch('FedLogOut').then(() => {
+              this.$router.push({ path: '/login' })
+            })
+          })
+        } else {
+          this.$message({
+            message: res.m ? res.m : '获取图片列表失败！',
+            type: 'warning'
+          })
+        }
+      }).catch((err) => {
+        this.$message({
+          message: err.m ? err.m : '获取图片列表失败！',
+          type: 'error'
+        })
       })
     },
     /**
      * 启用禁用图片
      */
     changePicStatus(row) {
-      console.log(row)
-      console.log(row.id)
+      const data = {
+        id: row.id,
+        picStatus: row.picStatus ? 0 : 1
+      }
+      bannerApi.updatePicture(data).then((response) => {
+        const res = response.data
+        console.log(res)
+        if (res.code === '000000') {
+          this.$message({
+            message: res.m ? res.m : '更新图片专题成功！',
+            type: 'success'
+          })
+        } else if (res.e === '1000015') {
+          this.$message({
+            message: res.m ? res.m : '更新图片专题失败！',
+            type: 'warning'
+          })
+          this.$nextTick().then(() => {
+            this.$store.dispatch('FedLogOut').then(() => {
+              this.$router.push({ path: '/login' })
+            })
+          })
+        } else {
+          this.$message({
+            message: res.m ? res.m : '更新图片专题失败！',
+            type: 'warning'
+          })
+        }
+      }).catch((err) => {
+        this.$message({
+          message: err.m ? err.m : '更新图片专题失败！',
+          type: 'error'
+        })
+      })
     },
     /**
      * 切换每页显示条数
      */
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
-      this.getConfigCodeList()
+      console.log('12')
+      this.pageSize = val
+      this.showPicture()
     },
     /**
      * 跳转，上一页上一页
      */
     handleCurrentChange(val) {
-      this.getConfigCodeList()
-      console.log(`当前页 跳转: ${val}`)
+      this.currentPage = val
+      this.showPicture()
     }
   },
   mounted() {
