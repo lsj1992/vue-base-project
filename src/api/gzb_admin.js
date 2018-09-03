@@ -8,7 +8,14 @@ export function getSumRoleList(data) {
     data
   })
 }
-export function delSumRoleTable(data) {
+export function getRoleValueList(data) {
+  return request({
+    url: '/crm/sumRole/getGzbSumRole',
+    method: 'post',
+    data
+  })
+}
+export function deleteRoleTable(data) {
   return request({
     url: '/crm/sumRole/deleteGzbSumRole',
     method: 'post',

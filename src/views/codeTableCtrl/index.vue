@@ -1,27 +1,20 @@
 <template>
   <div class="codeTableCtrl">
-    <!-- 顶部台南佳和搜索框 -->
     <el-row>
       <el-col :span="24">
         <div class="search_box">
           <el-button type="primary" @click="codeTable('add')" plain>添加</el-button>
-          <el-input class="search_input" 
-            v-model="searchCon"
-            placeholder="请输入内容">
+          <el-input class="search_input" v-model="searchCon" placeholder="请输入内容">
             <el-button slot="append" @click="searchCodeTable" icon="el-icon-search"></el-button>
           </el-input>
         </div>
       </el-col>
     </el-row>
-    <!-- 码表列表 -->
     <el-table
       :data="codeTableList"
       border
       style="width: 100%">
-      <el-table-column
-        label="码表名称"
-        align="center"
-        style="width: 20%;">
+      <el-table-column label="码表名称" align="center" style="width: 20%;">
         <template slot-scope="scope">
           <el-input type="hidden" v-model="scope.row.id"> </el-input>
           {{scope.row.configName}}
@@ -50,109 +43,95 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- 码表分页 -->
-    <el-pagination
-      class="pagination_box"
-      background
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage"
-      :page-sizes="pageSizes"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total">
-    </el-pagination>
-    <!-- 对话框用来 查看 编辑 码表 -->
-    <el-dialog class="add_code_table" :title="dialogTit" :fullscreen="fullscreen" :visible.sync="dialogFormVisible">
-      <!-- 增加表单验证  -->
-      <el-form class="add_code_form" ref="codeTableRefs"  :rules="validateCodeTable" :model="dialogCode">
-        <el-form-item prop="configName">
-          <el-input placeholder="请输入码表名称" name="configName" v-model="dialogCode.configName" :disabled="disabled">
-            <template slot="prepend">码表名称</template>
-          </el-input>
-          <el-input type="hidden" v-model="dialogCode.id"></el-input>
-        </el-form-item>
-        <el-form-item prop="configValue">
-          <el-input placeholder="请输入码表值" name="configValue" v-model="dialogCode.configValue" :disabled="disabled">
-            <template slot="prepend" style="width:200px">码表值</template>
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="configDescription">
-          <el-input placeholder="请输入码表描述" name="configDescription" v-model="dialogCode.configDescription" :disabled="disabled">
-            <template slot="prepend">码表描述</template>
-          </el-input>
-        </el-form-item>
-        <!-- 码值列表 开始-->
-        <el-form-item>
-          <el-button type="primary" @click="addCodeValue" plain :disabled="disabled">增加</el-button>
-        </el-form-item>
-        <el-form-item class="code_value_table">
-          <el-table
-            :data="codeValueList"
-            :row-class-name="tableRowClassName"
-            border
-            style="width: 100%">
-            <el-table-column
-              label="码值"
-              align="center"
-              style="width: 25%">
-              <template slot-scope="scope">
-                <el-input placeholder="请输入码值" 
-                  v-model="scope.row.codeValue" 
-                  :disabled="disabled">
-                </el-input>
-                <el-input type="hidden" style="display: none;" v-model="scope.row.id"> </el-input>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="码值名称"
-              align="center"
-              style="width: 20%;">
-              <template slot-scope="scope">
-                <el-input placeholder="请输入码值名称" v-model="scope.row.codeName" :disabled="disabled">
-                </el-input>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="configDescription"
-              label="码值描述"
-              align="center"
-              style="width: 25%">
-              <template slot-scope="scope">
-                <el-input placeholder="请输入码值描述" prop="codeDescription" v-model="scope.row.codeDescription" :disabled="disabled">
-                </el-input>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="码值状态"
-              align="center"
-              style="width: 25%">
-              <template slot-scope="scope">
-                <el-select v-model="scope.row.codeStatus" :disabled="disabled" placeholder="请选择">
-                  <el-option label="可见" value="0"></el-option>
-                  <el-option label="不可见" value="1"></el-option>
-                </el-select>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="操作"
-              align="center"
-              style="width: 35%">
-              <template slot-scope="scope">
-                <el-button @click="deleteConfim('codeValue', scope.row)" type="primary" :disabled="disabled" size="small">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-form-item>
-        <!-- 码值列表 结束-->
-      </el-form>
-      <!-- 列表 底部 开始-->
-      <div slot="footer" v-show="showStatus" class="dialog_footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addOrEditCodeTable">确 定</el-button>
-      </div>
-      <!-- 列表 底部 结束-->
-    </el-dialog>
+  <!-- 对话框用来 查看 编辑 码表 -->
+  <el-dialog class="add_code_table" :title="dialogTit" :fullscreen="fullscreen" :visible.sync="dialogFormVisible">
+    <el-form class="add_code_form" :model="dialogCode">
+      <el-form-item>                 
+        <el-input placeholder="请输入码表名称"  v-model="dialogCode.configName" :disabled="disabled">
+          <template slot="prepend">码表名称</template>
+        </el-input>
+        <el-input type="hidden" v-model="dialogCode.id"></el-input>
+        <!-- <el-input v-model="dialogCode.configName" :disabled="disabled" auto-complete="off"></el-input> -->
+      </el-form-item>
+      <el-form-item >
+        <el-input placeholder="请输入码表值"  v-model="dialogCode.configName" :disabled="disabled">
+          <template slot="prepend" style="width:200px">码表值</template>
+        </el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input placeholder="请输入码表描述"  v-model="dialogCode.configName" :disabled="disabled">
+          <template slot="prepend">码表描述</template>
+        </el-input>
+      </el-form-item>
+      <!-- 码值列表 开始-->
+       <el-form-item>
+        <el-button type="primary" @click="addCodeValue" plain :disabled="disabled">增加</el-button>
+      </el-form-item>
+      <el-form-item>
+         <el-table
+          :data="codeValueList"
+          :row-class-name="tableRowClassName"
+          border
+          style="width: 100%">
+          <el-table-column
+            label="码值"
+            align="center"
+            style="width: 25%">
+            <template slot-scope="scope">
+              <el-input placeholder="请输入码值"  v-model="scope.row.codeValue" :disabled="disabled">
+              </el-input>
+              <el-input type="hidden" style="display: none;" v-model="scope.row.id"> </el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="码值名称"
+            align="center"
+            style="width: 20%;">
+            <template slot-scope="scope">
+              <el-input placeholder="请输入码值名称"  v-model="scope.row.codeName" :disabled="disabled">
+              </el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="configDescription"
+            label="码值描述"
+            align="center"
+            style="width: 25%">
+            <template slot-scope="scope">
+              <el-input placeholder="请输入码值描述"  v-model="scope.row.codeDescription" :disabled="disabled">
+              </el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="码值状态"
+            align="center"
+            style="width: 25%">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.codeStatus" :disabled="disabled" placeholder="请选择">
+                <el-option label="可见" value="0"></el-option>
+                <el-option label="不可见" value="1"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="操作"
+            align="center"
+            style="width: 35%">
+            <template slot-scope="scope">
+              <el-button @click="deleteConfim('codeValue', scope.row)" type="primary" :disabled="disabled" size="small">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form-item>
+      <!-- 码值列表 开始-->
+    </el-form>
+    <!-- 列表 底部 开始-->
+    <div slot="footer" v-show="showStatus" class="dialog_footer">
+      <el-button @click="dialogFormVisible = false">取 消</el-button>
+      <el-button type="primary" @click="addOrEditCodeTable">确 定</el-button>
+    </div>
+    <!-- 列表 底部 开始-->
+  </el-dialog>
   </div>
 </template>
 <script>
@@ -163,52 +142,14 @@ import {
   delCodeValue,
   addOrEditCodeTable
 } from '@/api/gzb_code_table'
-// import { isEmpty } from '@/utils/validate'
 export default {
   components: { },
   name: 'codeTableCtrl',
   data() {
-    const validateConfigName = (rule, value, callback) => {
-      if ((/\d/.test(value))) {
-        callback(new Error('码表名称不能有数子'))
-      } else if (!value || value.trim().length <= 0) {
-        callback(new Error('码表名称不能为空!'))
-      } else {
-        callback()
-      }
-    }
-    const validateConfigValue = (rule, value, callback) => {
-      console.log(value)
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码表值不能为空!'))
-      } else {
-        callback()
-      }
-    }
-    const validateConfigDescription = (rule, value, callback) => {
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码表描述不能为空'))
-      } else {
-        callback()
-      }
-    }
-    const validateCodeValue = (rule, value, callback) => {
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码值名称不能为空'))
-      } else {
-        callback()
-      }
-    }
-    const validateCcodeDescription = (rule, value, callback) => {
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码值名称不能为空'))
-      } else {
-        callback()
-      }
-    }
     return {
       searchCon: '', // 搜索框内容
       codeTableList: [], // ⭐码表列表数据
+      count: 0, // 码表总条数
       dialogTit: '', // 弹出框的标题
       showStatus: true, // 弹出框底部按钮是否显示
       dialogFormVisible: false, // 弹出框是否显示
@@ -218,7 +159,7 @@ export default {
       codeValueList: [], // ⭐码值列表数据
       isAddOrEdit: true, // 用来区分是增加码表还是编辑码值， true是增加码表，false是编辑码值
       // ⭐⭐码值数据格式，用来增加码值时候用
-      baseCodeVal: {
+      baeeCodeVal: {
         codeDescription: '',
         codeName: '',
         codeOrder: '',
@@ -235,18 +176,8 @@ export default {
       currentPage: 1, // 当前第几页
       total: 0, // 总共多少页
       page: 1, // 页码
-      pageSizes: [10, 20, 30, 40, 50],
-      pageSize: 5, // 每页显示数据
-      loading: false, // 加载状态
-      // 添加码表页面表单验证
-      validateCodeTable: {
-        configName: [{ required: true, trigger: 'blur', validator: validateConfigName }],
-        configValue: [{ required: true, trigger: 'blur', validator: validateConfigValue }],
-        configDescription: [{ required: true, trigger: 'blur', validator: validateConfigDescription }],
-        codeValue: [{ required: true, trigger: 'blur', validator: validateCodeValue }],
-        codeDescription: [{ required: true, trigger: 'blur', validator: validateCcodeDescription }]
-        // password: [{ required: true, trigger: 'blur', validator: validatePassword }] }
-      }
+      pageSize: 10, // 每页显示数据
+      loading: false // 加载状态
     }
   },
   filters: {},
@@ -277,7 +208,7 @@ export default {
      * 新增码值
      */
     addCodeValue() {
-      this.codeValueList.push(Object.assign({}, this.baseCodeVal))
+      this.codeValueList.push(Object.assign({}, this.baeeCodeVal))
     },
     /**
      * 获取码表列表
@@ -288,9 +219,7 @@ export default {
         const res = response.data
         if (res.code === 0) {
           _this.$set(_this, 'codeTableList', res.data)
-          _this.total = res.count
-          console.log(res)
-          console.log(typeof _this.total)
+          _this.count = res.count
         }
       })
     },
@@ -360,24 +289,13 @@ export default {
       const _this = this
       let confimTit = '确定要删除该码表吗？'
       let confimCon = '永久将删除哦，您确定吗？'
-      let isDelCodeTable = true
+      let isDelRoleTable = true
+      const isDelCodeTable = true
+      console.log(isDelRoleTable, isDelCodeTable)
       if (status === 'codeTable') {
         confimTit = '确定要删除该码表吗？'
         confimCon = row.configName
-        isDelCodeTable = true
-      } else if (status === 'codeValue') {
-        if (_this.codeValueList.length === 1) {
-          _this.$message({
-            type: 'warning',
-            message: '至少保留一个码值!'
-          })
-          return false
-        } else {
-          confimTit = '确定要删除该码值吗？'
-        }
-        // isNewAdd
-        confimCon = row.codeName
-        isDelCodeTable = false
+        isDelRoleTable = true
       }
       _this.$confirm(confimCon, confimTit, {
         confirmButtonText: '确定',
@@ -425,7 +343,7 @@ export default {
         _this.dialogTit = '添加码表'
         _this.dialogCode = {}
         _this.codeValueList = []
-        _this.codeValueList.push(Object.assign({}, _this.baseCodeVal))
+        _this.codeValueList.push(Object.assign({}, _this.baeeCodeVal))
         _this.disabled = false
         _this.showStatus = true
         _this.isAddOrEdit = true
@@ -436,54 +354,30 @@ export default {
     * */
     addOrEditCodeTable() {
       const _this = this
-      // 表单验证
-      _this.$refs.codeTableRefs.validate(valid => {
-        if (valid) {
-          const data = {
-            configName: _this.dialogCode.configName,
-            configValue: _this.dialogCode.configValue,
-            configDescription: _this.dialogCode.configDescription,
-            configCodeListStr: this.codeValueList
-          }
-          addOrEditCodeTable(_this.isAddOrEdit, data).then(function(response) {
-            const res = response.data
-            if (res.e === '000000') {
-              _this.$message({
-                type: 'success',
-                message: res.m ? res.m : '修改码值成功!'
-              })
-              _this.getConfigCodeList()
-              _this.dialogFormVisible = false
-            } else {
-              _this.$message({
-                type: 'warning',
-                message: res.m ? res.m : '修改码值失败!'
-              })
-            }
-          }).catch(function(err) {
-            _this.$message({
-              type: 'warning',
-              message: err.m ? err.m : '修改码值失败!'
-            })
+      const data = {
+
+      }
+      addOrEditCodeTable(_this.isAddOrEdit, data).then(function(response) {
+        const res = response.data
+        if (res.e === '000000') {
+          _this.$message({
+            type: 'success',
+            message: res.m ? res.m : '修改码值成功!'
           })
+          _this.getConfigCodeList()
+          _this.dialogFormVisible = false
         } else {
-          return false
+          _this.$message({
+            type: 'warning',
+            message: res.m ? res.m : '修改码值失败!'
+          })
         }
+      }).catch(function(err) {
+        _this.$message({
+          type: 'warning',
+          message: err.m ? err.m : '修改码值失败!'
+        })
       })
-    },
-    /**
-     * 切换每页显示条数
-     */
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
-      this.getConfigCodeList()
-    },
-    /**
-     * 跳转，上一页上一页
-     */
-    handleCurrentChange(val) {
-      this.getConfigCodeList()
-      console.log(`当前页 跳转: ${val}`)
     }
   },
   mounted() {
@@ -494,18 +388,9 @@ export default {
 </script>
 <style scoped>
 .codeTableCtrl {
-  position: relative;
-  padding: 30px 20px 20px;
-  /* height: calc(100vh - 84px); */
-  overflow: auto;
+  padding: 0 20px;
+  padding-top: 30px;
 }
-/* .pagination_box {
-  position: fixed;
-  left: 0;
-  bottom: -0px;
-  height: 50px;
-  margin: 10px 0;
-} */
 .search_box {
   height: 60px;
   line-height: 60px;
@@ -525,17 +410,7 @@ export default {
   width: 100px;
   text-align: center;
 }
-.el-dialog__body {
-  height: auto;
-}
 .dialog_footer {
   text-align: center;
 }
-.codeTableCtrl >>> .el-form-item__content {
-  height: 50px;
-}
-.codeTableCtrl >>> .code_value_table .el-form-item__content {
-  height: auto;
-}
-
 </style>
