@@ -252,6 +252,9 @@ export default {
         _this.isAddOrEdit = true
       }
     },
+    /**
+    * 确认 增加/编辑，码表、 码值
+    * */
     addOrEditRoleTable() {
       const _this = this
       const data = {

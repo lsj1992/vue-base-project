@@ -299,7 +299,6 @@ export default {
      * 切换每页显示条数
      */
     handleSizeChange(val) {
-      console.log('12')
       this.pageSize = val
       this.showPicture()
     },

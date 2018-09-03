@@ -311,6 +311,7 @@ export default {
           const res = response.data
           if (res.e === '000000') {
             this.imagesTableList.splice(this.imagesTableList.findIndex(item => item.id === row.id), 1)
+            this.total--
             this.$message({
               type: 'success',
               message: '删除成功!'
@@ -330,11 +331,10 @@ export default {
     handleSizeChange(val) {
       if (this.dialogFormVisible) {
         this.dialogPageSize = val
-        this.getBannerList(true)
       } else {
         this.pageSize = val
-        this.getBannerList(false)
       }
+      this.getBannerList(false)
     },
     /**
      * 跳转，上一页上一页
@@ -342,10 +342,10 @@ export default {
     handleCurrentChange(val) {
       if (this.dialogFormVisible) {
         this.dialogCurrentPage = val
-        this.getBannerList(true)
       } else {
         this.currentPage = val
       }
+      this.getBannerList(true)
     }
   },
   mounted() {

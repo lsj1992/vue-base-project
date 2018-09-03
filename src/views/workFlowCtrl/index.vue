@@ -99,10 +99,10 @@
             <template slot="prepend">工作流名称</template>
           </el-input>
            <el-switch
-              v-model="flowStatus"
+              v-model="detailFlowData.flowStatus"
               active-text="启用"
               inactive-text="禁用"
-              @change="changeFlowStatus()"
+              @change="changeFlowStatus"
               >
             </el-switch>
         </el-form-item>
@@ -287,11 +287,11 @@ export default {
         duration: 10, // 等待周期
         flowId: 0,
         flowOrder: 0,
-        flowRoleId: 0,
+        flowRoleId: '0',
         isApproval: 0, // 是否添加组件 0 是 1 否
         isAttach: 0, // 是否需要审批
         remindId: '', // SMS 短信， email  email
-        sumRoleId: 0, // 班组id
+        sumRoleId: '', // 班组id
         sumRoleName: '', // 班组名称
         thirdFunctionId: '', // TAX BUREAU 税务局 POSTAL_BANK 邮储银行
         isSelfAdd: true // 用来区分是自己添加的还是服务端获取的
@@ -400,6 +400,14 @@ export default {
       })
     },
     /**
+     * 添加工作流验证
+     */
+    addFlowValidate() {
+      console.log(this.detailFlowData)
+      console.log(this.detailFlowStep)
+      return false
+    },
+    /**
      * 删除工作流
      */
     delFlow(isBatch, row) {
@@ -434,9 +442,11 @@ export default {
             if (isBatch.length > 0) {
               isBatch.forEach((id) => {
                 this.flowList.splice(this.flowList.findIndex(item => item.id === id), 1)
+                this.total--
               })
             } else {
               this.flowList.splice(this.flowList.findIndex(item => item.id === row.id), 1)
+              this.total--
             }
             this.total = this.flowList.length
           } else if (res.e === '1000015') {
@@ -534,7 +544,11 @@ export default {
           pageSize: 40
         }]
       if (addOrEdit === 'add') {
-        this.detailFlowData = {}
+        this.detailFlowData = {
+          flowStatus: '',
+          flowName: '',
+          discrible: ''
+        }
         this.detailFlowStep = []
         this.detailFlowStep.push(Object.assign({}, this.getGzb01TFlow))
         gzbFlow.getQueryCode(queryList).then(http.spread((RoleList, noticeType, thirdpartyApp) => {
@@ -544,11 +558,18 @@ export default {
         }))
       } else if (addOrEdit === 'edit') {
         queryList.push({ id: row.id })
+        console.log('edit')
         gzbFlow.getAllFlowDetail(queryList).then(http.spread((RoleList, noticeType, thirdpartyApp, flowDetail) => {
-          this.$set(this, 'RoleList', RoleList.data.d)
+          this.RoleList = RoleList.data.d
           this.$set(this, 'noticeType', noticeType.data.d)
           this.detailFlowData = flowDetail.data.d.getGzb01TFlow
           this.detailFlowStep = flowDetail.data.d.getFlowDetail
+          console.log(this.detailFlowData)
+          console.log(this.detailFlowStep)
+          this.detailFlowData.flowStatus = this.detailFlowData.flowStatus === 0
+          this.detailFlowStep.forEach(item => {
+            item.sumRoleId = item.sumRoleId.toString()
+          })
           this.$set(this, 'thirdpartyApp', thirdpartyApp.data.d)
         }))
       }
@@ -562,7 +583,7 @@ export default {
       this.detailFlowStep.forEach(item => {
         stepData = {
           'flowOrder': item.rowIndex - 1,
-          'flowRoleId': item.flowRoleId,
+          'flowRoleId': item.flowRoleId.toString(),
           'remindId': item.remindId,
           'duration': item.duration,
           'thirdFunctionId': item.thirdFunctionId,
@@ -576,9 +597,13 @@ export default {
         id: this.detailFlowData.id ? this.detailFlowData.id : 0, // id 的默认值
         flowName: this.detailFlowData.flowName,
         discrible: this.detailFlowData.discrible,
-        flowStatus: this.flowStatus ? 0 : 1, // 状态的默认值
+        flowStatus: this.detailFlowData.flowStatus ? 0 : 1, // 状态的默认值
         gzb01TFlowDetailListStr: JSON.stringify(stepDatas)
       }
+      // const result = this.addFlowValidate()
+      // if (!result) {
+      //   return false
+      // }
       gzbFlow.updateFlowDetailList(submitData).then((response) => {
         console.log(response)
         const res = response.data
@@ -623,20 +648,22 @@ export default {
     /**
      * 改变 某工作流启用禁用状态, 由于v-model无法使用过滤器，则通过computed实现
      */
-    changeFlowStatus() {
-      this.flowStatus = !this.detailFlowData.flowStatus
+    changeFlowStatus(val) {
+      console.log(val)
     },
     /**
      * 切换每页显示条数
      */
-    handleSizeChange() {
-      this.getFlowList()
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.showPicture()
     },
     /**
      * 跳转，上一页上一页
      */
-    handleCurrentChange() {
-      this.getFlowList()
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.showPicture()
     }
   },
   mounted() {
