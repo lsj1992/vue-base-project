@@ -15,9 +15,14 @@ export function getRoleValueList(data) {
     data
   })
 }
-export function deleteRoleTable(data) {
+export function deleteRoleTable(isList, data) {
+  let url = '/crm/sumRole/deleteGzbSumRole'
+  if (isList) {
+    url = '/crm/sumRole/deleteGzbSumRoleList'
+  }
+  console.log(url)
   return request({
-    url: '/crm/sumRole/deleteGzbSumRole',
+    url: url,
     method: 'post',
     data
   })
