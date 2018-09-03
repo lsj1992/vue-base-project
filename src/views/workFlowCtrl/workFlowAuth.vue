@@ -5,8 +5,10 @@
       <el-col :span="24">
         <div class="search_box">
           <el-row>
-            <el-col :span="8">
+            <el-col :span="10">
+              <span :span="1">班组：</span>
               <el-select
+                :span="9"
                 v-model="teamVal"
                 filterable
                 @change="searchFlowList"
@@ -57,7 +59,6 @@
               v-model="scope.row.isAvailable"
               active-text="启用"
               inactive-text="禁用"
-              disabled
               @click.native="changeFlowStatus(scope.row)"
               >
             </el-switch>
@@ -350,9 +351,11 @@ export default {
         const res = response.data
         if (res.code === '000000') {
           this.flowList = res.data
-          this.flowList.map(item => {
+          console.log(this.flowList)
+          this.flowList.forEach(item => {
             item.isAvailable = item.isAvailable === 0
           })
+          console.log(this.flowList)
           this.showFlowList = true
           this.total = res.count
         }
@@ -391,8 +394,8 @@ export default {
      */
     changeFlowStatus(row) {
       const data = {
-        allotId: row.allotId, // 班组id
-        allotType: row.allotType, // 分类匹配 0 班组 1 企业 2 项目
+        allotId: this.teamVal, // 班组id 上面的班组id
+        allotType: 0, // 分类匹配 0 班组 1 企业 2 项目
         flowId: row.flowId, // 工作流id
         isAvailable: row.isAvailable ? 0 : 1 // 启用禁用状态
       }
@@ -428,13 +431,15 @@ export default {
      * 切换每页显示条数
      */
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
+      this.pageSize = val
+      this.searchFlowList()
     },
     /**
      * 跳转，上一页上一页
      */
     handleCurrentChange(val) {
-      console.log(`当前页 跳转: ${val}`)
+      this.currentPage = val
+      this.searchFlowList()
     }
   },
   mounted() {

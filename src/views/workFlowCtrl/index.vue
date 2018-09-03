@@ -57,13 +57,6 @@
         style="width: 25%">
           <template slot-scope="scope">
             {{scope.row.flowStatus === 0 ? '启用' : '禁用'}}
-            <!-- <el-switch
-              v-model="scope.row.flowStatus"
-              active-text="启用"
-              inactive-text="禁用"
-              @change="changeFlowStatus(scope.row)"
-              >
-            </el-switch> -->
           </template>
       </el-table-column>
       <el-table-column
@@ -93,9 +86,12 @@
       width="80%"
       :visible.sync="dialogFormVisible">
       <!-- 增加表单验证  -->
-      <el-form class="add_image_form" :model="detailFlowData">
-        <el-form-item>
-          <el-input name="configName" style="width: 40%; margin-right: 25px;" v-model="detailFlowData.flowName">
+      <el-form class="add_image_form"
+        :model="detailFlowData"
+        ref="flowForm"
+        :rules="validateFlow">
+        <el-form-item prop="flowName">
+          <el-input name="flowName" style="width: 40%; margin-right: 25px;" v-model="detailFlowData.flowName">
             <template slot="prepend">工作流名称</template>
           </el-input>
            <el-switch
@@ -106,9 +102,10 @@
               >
             </el-switch>
         </el-form-item>
-        <el-form-item class="flow_desc" label="工作流描述">
+        <el-form-item prop="discrible" class="flow_desc" label="工作流描述">
           <el-input
             type="textarea"
+            name="discrible"
             :autosize="{ minRows: 3}"
             v-model="detailFlowData.discrible">
           </el-input>
@@ -119,133 +116,133 @@
         <el-form-item>
           <!-- 步骤 -->
           <el-table
-          :data="detailFlowStep"
-          :row-class-name="tableRowClassName"
-          border
-          background
-          style="width: 100%">
-          <el-table-column
-            fixed
-            prop="rowIndex"
-            label="步骤"
-            align="center"
-            width="50">
-          </el-table-column>
-          <el-table-column
-            label="审批角色"
-            align="center"
-            width="250">
+            :data="detailFlowStep"
+            :row-class-name="tableRowClassName"
+            border
+            background
+            style="width: 100%">
+            <el-table-column
+              fixed
+              prop="rowIndex"
+              label="步骤"
+              align="center"
+              width="50">
+            </el-table-column>
+            <el-table-column
+              label="审批角色"
+              align="center"
+              width="250">
+                <template slot-scope="scope">
+                <el-select v-model="scope.row.flowRoleId" placeholder="请选择">
+                  <el-option
+                    v-for="item in RoleList"
+                    :key="item.sumRoleId"
+                    :label="item.sumRoleName"
+                    :value="item.sumRoleId">
+                  </el-option>
+              </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="通知形式"
+              align="center"
+              width="200">
               <template slot-scope="scope">
-              <el-select v-model="scope.row.flowRoleId" placeholder="请选择">
+                <el-select v-model="scope.row.remindId" placeholder="请选择">
+                  <el-option
+                    v-for="item in noticeType"
+                    :key="item.codeValue"
+                    :label="item.codeName"
+                    :value="item.codeValue">
+                  </el-option>
+              </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="等待周期"
+              align="center"
+              width="150">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.duration" placeholder="请选择">
                 <el-option
-                  v-for="item in RoleList"
-                  :key="item.sumRoleId"
-                  :label="item.sumRoleName"
-                  :value="item.sumRoleId">
+                  v-for="item in weatTime"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
                 </el-option>
-            </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="通知形式"
-            align="center"
-            width="200">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.remindId" placeholder="请选择">
+              </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="第三方程序"
+              align="center"
+              width="250">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.thirdFunctionId" placeholder="请选择">
                 <el-option
-                  v-for="item in noticeType"
+                  v-for="item in thirdpartyApp"
                   :key="item.codeValue"
                   :label="item.codeName"
                   :value="item.codeValue">
                 </el-option>
-            </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="等待周期"
-            align="center"
-            width="150">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.duration" placeholder="请选择">
-              <el-option
-                v-for="item in weatTime"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="第三方程序"
-            align="center"
-            width="250">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.thirdFunctionId" placeholder="请选择">
-              <el-option
-                v-for="item in thirdpartyApp"
-                :key="item.codeValue"
-                :label="item.codeName"
-                :value="item.codeValue">
-              </el-option>
-            </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="中止回滚节点"
-            align="center"
-            width="250">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.whereabouts" placeholder="请选择">
-              <el-option
-                v-for="item in whereGo"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="是否需要审批"
-            align="center"
-            width="100">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.isAttach" placeholder="请选择">
-              <el-option
-                v-for="item in isNeedApproval"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="是否添加附件"
-            align="center"
-            width="100">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.isApproval" placeholder="请选择">
-              <el-option
-                v-for="item in isNeedUplodFile"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-            </template>
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            label="操作"
-            align="center"
-            width="100">
-            <template slot-scope="scope">
-             <el-button @click="deletStep(scope.row)" type="danger" size="small">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+              </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="中止回滚节点"
+              align="center"
+              width="250">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.whereabouts" placeholder="请选择">
+                <el-option
+                  v-for="item in whereGo"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="是否需要审批"
+              align="center"
+              width="100">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.isAttach" placeholder="请选择">
+                <el-option
+                  v-for="item in isNeedApproval"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="是否添加附件"
+              align="center"
+              width="100">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.isApproval" placeholder="请选择">
+                <el-option
+                  v-for="item in isNeedUplodFile"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              label="操作"
+              align="center"
+              width="100">
+              <template slot-scope="scope">
+              <el-button @click="deletStep(scope.row)" type="danger" size="small">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-form-item>
       </el-form>
       <!-- 列表 底部 开始-->
@@ -264,6 +261,20 @@ export default {
   components: { },
   name: 'workFlowCtrl',
   data() {
+    const validateFlowName = (rule, value, callback) => {
+      if (!value || value.trim().length <= 0) {
+        callback(new Error('工作流名称不能为空'))
+      } else {
+        callback()
+      }
+    }
+    const validateDiscrible = (rule, value, callback) => {
+      if (!value || value.trim().length <= 0) {
+        callback(new Error('工作流描述不能为空'))
+      } else {
+        callback()
+      }
+    }
     return {
       teamVal: '', // 选择的班组
       teamList: [], // 分组列表【select下拉框中的值】
@@ -276,6 +287,7 @@ export default {
       dialogTit: '工作流详情', // 弹窗的标题
       fullscreen: false, // 弹窗的全屏控制
       dialogFormVisible: false, // 弹窗的展示隐藏
+      isAddOrEdit: 'isAdd', // 用来区分是添加还是更新工作流， isAdd, isEdit
       detailFlowData: {}, // 工作流详情
       detailFlowStep: [], // 工作流详情 步骤
       selectIds: [], // 选中行的id
@@ -287,16 +299,16 @@ export default {
         duration: 10, // 等待周期
         flowId: 0,
         flowOrder: 0,
-        flowRoleId: '0',
+        flowRoleId: '',
         isApproval: 0, // 是否添加组件 0 是 1 否
         isAttach: 0, // 是否需要审批
         remindId: '', // SMS 短信， email  email
         sumRoleId: '', // 班组id
         sumRoleName: '', // 班组名称
         thirdFunctionId: '', // TAX BUREAU 税务局 POSTAL_BANK 邮储银行
-        isSelfAdd: true // 用来区分是自己添加的还是服务端获取的
+        isSelfAdd: true, // 用来区分是自己添加的还是服务端获取的
+        whereabouts: 0 // 终止后返回
       },
-      whereabouts: 0,
       weatTime: [
         {
           value: 10,
@@ -347,21 +359,20 @@ export default {
           value: 1,
           label: '否'
         }
-      ]
+      ],
+      msg: '', // 表单验证展示的文字
+      flag: true, // 表单验证用来判断是否验证通过
+      tableFlag: true, // 配合表单验证区分是上面的form还是下面的table中的
+      // 表单验证
+      validateFlow: {
+        flowName: [{ required: true, trigger: 'blur', validator: validateFlowName }],
+        discrible: [{ required: true, trigger: 'blur', validator: validateDiscrible }]
+      }
     }
   },
   filters: {
   },
   computed: {
-    flowStatus: {
-      get() {
-        return this.detailFlowData.flowStatus === 0
-      },
-      set(val) {
-        this.detailFlowData.flowStatus = val === true ? 0 : 1
-        console.log(this.detailFlowData.flowStatus)
-      }
-    }
   },
   created() {
     this.getFlowList()
@@ -403,9 +414,34 @@ export default {
      * 添加工作流验证
      */
     addFlowValidate() {
-      console.log(this.detailFlowData)
-      console.log(this.detailFlowStep)
-      return false
+      this.flag = this
+      this.$refs.flowForm.validate(valid => {
+        if (!valid) {
+          this.flag = false
+          return false
+        } else {
+          this.tableFlag = true
+          this.detailFlowStep.map((item, index) => {
+            if (item.flowRoleId === '') {
+              this.msg = '审批角色不能为空'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            } else if (item.remindId === '') {
+              this.msg = '通知形式不能为空'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            } else if (item.thirdFunctionId === '') {
+              this.msg = '第三方程序不能为空'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            }
+          })
+        }
+      })
+      return true
     },
     /**
      * 删除工作流
@@ -544,6 +580,7 @@ export default {
           pageSize: 40
         }]
       if (addOrEdit === 'add') {
+        this.isAddOrEdit = 'isAdd'
         this.detailFlowData = {
           flowStatus: '',
           flowName: '',
@@ -558,14 +595,12 @@ export default {
         }))
       } else if (addOrEdit === 'edit') {
         queryList.push({ id: row.id })
-        console.log('edit')
+        this.isAddOrEdit = 'isEdit'
         gzbFlow.getAllFlowDetail(queryList).then(http.spread((RoleList, noticeType, thirdpartyApp, flowDetail) => {
           this.RoleList = RoleList.data.d
           this.$set(this, 'noticeType', noticeType.data.d)
           this.detailFlowData = flowDetail.data.d.getGzb01TFlow
           this.detailFlowStep = flowDetail.data.d.getFlowDetail
-          console.log(this.detailFlowData)
-          console.log(this.detailFlowStep)
           this.detailFlowData.flowStatus = this.detailFlowData.flowStatus === 0
           this.detailFlowStep.forEach(item => {
             item.sumRoleId = item.sumRoleId.toString()
@@ -580,7 +615,7 @@ export default {
     addOrEditCodeTable() {
       const stepDatas = []
       let stepData = {}
-      this.detailFlowStep.forEach(item => {
+      this.detailFlowStep.map(item => {
         stepData = {
           'flowOrder': item.rowIndex - 1,
           'flowRoleId': item.flowRoleId.toString(),
@@ -591,8 +626,8 @@ export default {
           'isApproval': item.isApproval,
           'isAttach': item.isAttach
         }
+        stepDatas.push(stepData)
       })
-      stepDatas.push(stepData)
       const submitData = {
         id: this.detailFlowData.id ? this.detailFlowData.id : 0, // id 的默认值
         flowName: this.detailFlowData.flowName,
@@ -600,12 +635,17 @@ export default {
         flowStatus: this.detailFlowData.flowStatus ? 0 : 1, // 状态的默认值
         gzb01TFlowDetailListStr: JSON.stringify(stepDatas)
       }
-      // const result = this.addFlowValidate()
-      // if (!result) {
-      //   return false
-      // }
-      gzbFlow.updateFlowDetailList(submitData).then((response) => {
-        console.log(response)
+      this.addFlowValidate()
+      if (!this.flag) {
+        if (!this.tableFlag) {
+          this.$message({
+            message: this.msg,
+            type: 'warning'
+          })
+        }
+        return false
+      }
+      gzbFlow.updateFlowDetailList(this.isAddOrEdit, submitData).then((response) => {
         const res = response.data
         if (res.e === '000000') {
           this.$message({
@@ -613,14 +653,15 @@ export default {
             type: 'success'
           })
           this.dialogFormVisible = false
+          this.getFlowList()
           // 这里找到 工作流列表中对应的行，将值改变为修改后的状态
-          const index = this.flowList.findIndex(item => item.id === submitData.id)
-          if (index !== -1) {
-            this.flowList[index].flowName = submitData.flowName
-            this.flowList[index].discrible = submitData.discrible
-            this.flowList[index].flowStatus = submitData.flowStatus
-            this.flowList[index].count = stepDatas.length
-          }
+          // const index = this.flowList.findIndex(item => item.id === submitData.id)
+          // if (index !== -1) {
+          //   this.flowList[index].flowName = submitData.flowName
+          //   this.flowList[index].discrible = submitData.discrible
+          //   this.flowList[index].flowStatus = submitData.flowStatus
+          //   this.flowList[index].count = stepDatas.length
+          // }
         } else if (res.e === '1000015') {
           this.$message({
             message: res.m ? res.m : '工作流修改失败',
@@ -643,10 +684,9 @@ export default {
           type: 'error'
         })
       })
-      // console.log(submitData)
     },
     /**
-     * 改变 某工作流启用禁用状态, 由于v-model无法使用过滤器，则通过computed实现
+     * 改变 某工作流启用禁用状态,
      */
     changeFlowStatus(val) {
       console.log(val)

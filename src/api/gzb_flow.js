@@ -104,9 +104,15 @@ export function getGzbSumRoleList(data) {
 /**
  * 添加或者编辑工作流
  */
-export function updateFlowDetailList(data) {
+export function updateFlowDetailList(status, data) {
+  let url = ''
+  if (status === 'isAdd') {
+    url = '/crm/flowdetail/addFlowDetailList'
+  } else {
+    url = '/crm/flowdetail/updateFlowDetailList'
+  }
   return request({
-    url: '/crm/flowdetail/updateFlowDetailList',
+    url: url,
     method: 'post',
     data
   })

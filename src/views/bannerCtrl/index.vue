@@ -210,7 +210,9 @@ export default {
         bannerUrl: ''
       }
       this.SET_SELECTED_BANNER(undefined)
-      this.$refs.showBanner.changeRadioStatus('')
+      this.$nextTick().then(() => {
+        this.$refs.showBanner.changeRadioStatus('')
+      })
       this.dialogTit = '添加轮播图'
     },
     /**
