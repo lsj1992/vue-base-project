@@ -741,6 +741,7 @@ export default {
           this.innerDialogVisible = false
           gzbFlow.getGzbSumRoleList().then((response) => {
             console.log(response)
+            this.RoleList = response.data.d
           })
         } else {
           this.$message({
