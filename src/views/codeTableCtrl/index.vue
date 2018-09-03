@@ -194,20 +194,6 @@ export default {
         callback()
       }
     }
-    // const validateCodeValue = (rule, value, callback) => {
-    //   if (!value || value.trim().length <= 0) {
-    //     callback(new Error('码值不能为空'))
-    //   } else {
-    //     callback()
-    //   }
-    // }
-    // const validateCcodeDescription = (rule, value, callback) => {
-    //   if (!value || value.trim().length <= 0) {
-    //     callback(new Error('码值描述不能为空'))
-    //   } else {
-    //     callback()
-    //   }
-    // }
     return {
       searchCon: '', // 搜索框内容
       codeTableList: [], // ⭐码表列表数据
@@ -364,7 +350,6 @@ export default {
         const data = {
           id: row.id
         }
-        console.log('=================')
         gzbCode.delCodeValue(data).then((response) => {
           const res = response.data
           if (res.e === '000000') {

@@ -138,3 +138,14 @@ export function getAllFlowDetail(data) {
     getFlowDetail(data[3])
   ])
 }
+/**
+ * 增加角色
+ */
+export function addGzbSumRole(data) {
+  const url = '/crm/sumRole/addGzbSumRole'
+  return request({
+    url: url,
+    method: 'post',
+    data
+  })
+}

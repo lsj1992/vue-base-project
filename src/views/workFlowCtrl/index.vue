@@ -248,13 +248,15 @@
       </el-form>
       <!-- 内部弹窗用来添加角色 -->
       <el-dialog
-        width="60%"
+        width="80%"
         title="添加角色"
         :visible.sync="innerDialogVisible"
         append-to-body>
-        <div>
-          添加banner
-        </div>
+        <addRule ref="innerDialog" :roluData="{}"></addRule>
+        <div slot="footer" class="dialog_footer">
+        <el-button @click="innerDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addRuleBtn">确 定</el-button>
+      </div>
       </el-dialog>
       <!-- 列表 底部 开始-->
       <div slot="footer" class="dialog_footer">
@@ -268,8 +270,11 @@
 <script>
 import * as gzbFlow from '@/api/gzb_flow'
 import { http } from '@/utils/request'
+import addRule from './component/addRule'
 export default {
-  components: { },
+  components: {
+    addRule
+  },
   name: 'workFlowCtrl',
   data() {
     const validateFlowName = (rule, value, callback) => {
@@ -722,6 +727,28 @@ export default {
      */
     addRule() {
       this.innerDialogVisible = true
+    },
+    /**
+     * 调用子组件的方法增加角色
+     */
+    addRuleBtn() {
+      this.$refs.innerDialog.addRule().then(res => {
+        if (res.e === '000000') {
+          this.$message({
+            message: res.m ? res.m : '添加角色成功！',
+            type: 'success'
+          })
+          this.innerDialogVisible = false
+          gzbFlow.getGzbSumRoleList().then((response) => {
+            console.log(response)
+          })
+        } else {
+          this.$message({
+            message: res.m ? res.m : '添加角色失败！',
+            type: 'warning'
+          })
+        }
+      })
     }
   },
   mounted() {
