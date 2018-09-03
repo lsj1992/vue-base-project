@@ -53,7 +53,7 @@
         </template>
        </el-table-column>
       <el-table-column
-        prop="picUrl"
+        prop="bannerUrl"
         label="链接"
         align="center"
         style="width: 25%">

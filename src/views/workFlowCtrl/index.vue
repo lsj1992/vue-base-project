@@ -133,14 +133,15 @@
               align="center"
               width="250">
                 <template slot-scope="scope">
-                <el-select v-model="scope.row.flowRoleId" placeholder="请选择">
-                  <el-option
-                    v-for="item in RoleList"
-                    :key="item.sumRoleId"
-                    :label="item.sumRoleName"
-                    :value="item.sumRoleId">
-                  </el-option>
-              </el-select>
+                  <el-select v-model="scope.row.flowRoleId" placeholder="请选择">
+                    <el-option
+                      v-for="item in RoleList"
+                      :key="item.sumRoleId"
+                      :label="item.sumRoleName"
+                      :value="item.sumRoleId">
+                    </el-option>
+                  </el-select>
+                  <el-button icon="el-icon-plus" @click="addRule" class="add_rule_btn" circle></el-button>
               </template>
             </el-table-column>
             <el-table-column
@@ -245,6 +246,16 @@
           </el-table>
         </el-form-item>
       </el-form>
+      <!-- 内部弹窗用来添加角色 -->
+      <el-dialog
+        width="60%"
+        title="添加角色"
+        :visible.sync="innerDialogVisible"
+        append-to-body>
+        <div>
+          添加banner
+        </div>
+      </el-dialog>
       <!-- 列表 底部 开始-->
       <div slot="footer" class="dialog_footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -367,7 +378,8 @@ export default {
       validateFlow: {
         flowName: [{ required: true, trigger: 'blur', validator: validateFlowName }],
         discrible: [{ required: true, trigger: 'blur', validator: validateDiscrible }]
-      }
+      },
+      innerDialogVisible: false // 内部潜逃弹窗用来添加角色
     }
   },
   filters: {
@@ -704,6 +716,12 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val
       this.showPicture()
+    },
+    /**
+     * 增加角色
+     */
+    addRule() {
+      this.innerDialogVisible = true
     }
   },
   mounted() {
@@ -748,5 +766,8 @@ export default {
 }
 .dialog_footer {
   text-align: center;
+}
+.workFlowCtrl >>> .add_rule_btn {
+  padding: 4px;
 }
 </style>

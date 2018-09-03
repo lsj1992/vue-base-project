@@ -147,7 +147,6 @@ export default {
       if (isDilog) {
         bannerApi.showEnabledPicture(data).then((response) => {
           const res = response.data
-          console.log(res)
           if (res.code === '000000') {
             this.dialogImagesTableList = res.data
             this.dialogTotal = res.count
@@ -221,30 +220,45 @@ export default {
     shureAddBanner() {
       if (this.isAddBanner) {
         let index = null
+        let msg = ''
+        let flag = true
+        const bannerData = this.detailBannerData
+        for (const key in bannerData) {
+          if (bannerData[key] === undefined || bannerData[key] === '') {
+            if (key === 'bannerIndex') {
+              msg = '轮播序号必填！'
+              flag = false
+            } else if (key === 'bannerType') {
+              msg = '轮播类型必填！'
+              flag = false
+            } else if (key === 'bannerDesc') {
+              msg = '轮播描述必填！'
+              flag = false
+            }
+            if (!flag) {
+              this.$message({
+                message: msg,
+                type: 'warning'
+              })
+              return false
+            }
+          }
+        }
         if (this.getSelectedBanner) {
           index = this.dialogImagesTableList.findIndex(item => item.id === this.getSelectedBanner)
         } else {
           this.$message({
-            message: '必填项不能为空',
+            message: '图片必须选择',
             type: 'warning'
           })
           return false
         }
         const data = {
           bannerPicId: this.getSelectedBanner,
-          bannerIndex: this.detailBannerData.bannerIndex,
-          bannerDesc: this.detailBannerData.bannerDesc,
-          bannerType: this.detailBannerData.bannerType,
+          bannerIndex: bannerData.bannerIndex,
+          bannerDesc: bannerData.bannerDesc,
+          bannerType: bannerData.bannerType,
           bannerUrl: this.dialogImagesTableList[index].picUrl
-        }
-        for (const index in data) {
-          if (data[index] === undefined || data[index] === '') {
-            this.$message({
-              message: '必填项不能为空',
-              type: 'warning'
-            })
-            return false
-          }
         }
         bannerApi.insertBanner(data).then((response) => {
           const res = response.data
@@ -261,7 +275,7 @@ export default {
       } else {
         const data = {
           id: this.detailBannerData.id,
-          bannerPicId: this.getSelectedBanner,
+          bannerPicId: this.detailBannerData.bannerPicId,
           bannerIndex: this.detailBannerData.bannerIndex,
           bannerDesc: this.detailBannerData.bannerDesc,
           bannerType: this.detailBannerData.bannerType,
@@ -297,6 +311,7 @@ export default {
           this.detailBannerData = res.d
           this.detailBannerData.bannerType = this.detailBannerData.bannerType.toString()
           this.showDialogImgList = false
+          console.log(this.detailBannerData.bannerPicId)
         }
       })
     },
