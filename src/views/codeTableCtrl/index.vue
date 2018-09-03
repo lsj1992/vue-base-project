@@ -173,6 +173,41 @@ export default {
   components: { },
   name: 'codeTableCtrl',
   data() {
+    const validateConfigName = (rule, value, callback) => {
+      if (!value || value.trim().length <= 0) {
+        callback(new Error('码表名不能为空'))
+      } else {
+        callback()
+      }
+    }
+    const validateConfigValue = (rule, value, callback) => {
+      if (!value || value.trim().length <= 0) {
+        callback(new Error('码表值不能为空'))
+      } else {
+        callback()
+      }
+    }
+    const validateConfigDescription = (rule, value, callback) => {
+      if (!value || value.trim().length <= 0) {
+        callback(new Error('码表描述不能为空'))
+      } else {
+        callback()
+      }
+    }
+    // const validateCodeValue = (rule, value, callback) => {
+    //   if (!value || value.trim().length <= 0) {
+    //     callback(new Error('码值不能为空'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
+    // const validateCcodeDescription = (rule, value, callback) => {
+    //   if (!value || value.trim().length <= 0) {
+    //     callback(new Error('码值描述不能为空'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       searchCon: '', // 搜索框内容
       codeTableList: [], // ⭐码表列表数据
@@ -186,11 +221,11 @@ export default {
       codeValueList: [], // ⭐码值列表数据
       isAddOrEdit: true, // 用来区分是增加码表还是编辑码值， true是增加码表，false是编辑码值
       // ⭐⭐码值数据格式，用来增加码值时候用
-      baeeCodeVal: {
+      baseCodeVal: {
         codeDescription: '',
         codeName: '',
         codeOrder: 1,
-        codeStatus: '',
+        codeStatus: '0',
         codeValue: '',
         configId: '',
         configValue: '',
@@ -213,13 +248,13 @@ export default {
       dialogPageSize: 10,
       dialogPageSizes: [10, 20, 30, 40, 50],
       // 添加码表页面表单验证
+      msg: '', // 表单验证展示的文字
+      flag: true, // 表单验证用来判断是否验证通过
+      tableFlag: true, // 配合表单验证区分是上面的form还是下面的table中的
       validateCodeTable: {
-        // configName: [{ required: true, trigger: 'blur', validator: validateConfigName }],
-        // configValue: [{ required: true, trigger: 'blur', validator: validateConfigValue }],
-        // configDescription: [{ required: true, trigger: 'blur', validator: validateConfigDescription }],
-        // codeValue: [{ required: true, trigger: 'blur', validator: validateCodeValue }],
-        // codeDescription: [{ required: true, trigger: 'blur', validator: validateCcodeDescription }]
-        // password: [{ required: true, trigger: 'blur', validator: validatePassword }] }
+        configName: [{ required: true, trigger: 'blur', validator: validateConfigName }],
+        configValue: [{ required: true, trigger: 'blur', validator: validateConfigValue }],
+        configDescription: [{ required: true, trigger: 'blur', validator: validateConfigDescription }]
       }
     }
   },
@@ -253,7 +288,7 @@ export default {
      * 新增码值
      */
     addCodeValue() {
-      this.codeValueList.push(Object.assign({}, this.baeeCodeVal))
+      this.codeValueList.push(Object.assign({}, this.baseCodeVal))
     },
     /**
      * 获取码表列表
@@ -329,6 +364,7 @@ export default {
         const data = {
           id: row.id
         }
+        console.log('=================')
         gzbCode.delCodeValue(data).then((response) => {
           const res = response.data
           if (res.e === '000000') {
@@ -362,19 +398,21 @@ export default {
       let confimTit = '确定要删除该码表吗？'
       let confimCon = '永久将删除哦，您确定吗？'
       let isDelRoleTable = true
-      const isDelCodeTable = true
-      console.log(isDelRoleTable, isDelCodeTable)
       if (status === 'codeTable') {
         confimTit = '确定要删除该码表吗？'
         confimCon = row.configName
         isDelRoleTable = true
+      } else {
+        confimTit = '确定要删除该码值吗？'
+        confimCon = row.codeName
+        isDelRoleTable = false
       }
       _this.$confirm(confimCon, confimTit, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        if (isDelCodeTable) {
+        if (isDelRoleTable) {
           _this.deleteCodeTable(row)
         } else {
           _this.deleteCodeValue(row)
@@ -430,52 +468,81 @@ export default {
       }
     },
     /**
+     * 码表表单验证
+     */
+    addFlowValidate() {
+      this.flag = this
+      this.$refs.codeTableRefs.validate(valid => {
+        if (!valid) {
+          this.flag = false
+          return false
+        } else {
+          this.tableFlag = true
+          this.codeValueList.map((item, index) => {
+            if (item.codeValue === '') {
+              this.msg = '码值不能为空'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            } else if (item.codeName === '') {
+              this.msg = '码值名称不能为空'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            } else if (item.codeDescription === '') {
+              this.msg = '码值描述不能为空'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            }
+          })
+        }
+      })
+      return true
+    },
+    /**
     * 确认 增加/编辑，码表、 码值
     * */
     addOrEditCodeTable() {
       // 表单验证
-      this.$refs.codeTableRefs.validate(valid => {
-        if (valid) {
-          const data = {
-            id: this.dialogCode.id,
-            configName: this.dialogCode.configName,
-            configValue: this.dialogCode.configValue,
-            configDescription: this.dialogCode.configDescription,
-            configCodeListStr: JSON.stringify(this.codeValueList)
-          }
-          const msg = this.isAddOrEdit ? '添加码表成功' : '修改码表成功'
-          const errorMsg = this.isAddOrEdit ? '添加码表失败' : '修改码表失败'
-          gzbCode.addOrEditCodeTable(this.isAddOrEdit, data).then(response => {
-            const res = response.data
-            if (res.e === '000000') {
-              this.$message({
-                type: 'success',
-                message: res.m ? res.m : msg
-              })
-              this.getConfigCodeList()
-              this.dialogFormVisible = false
-            } else {
-              this.$message({
-                type: 'warning',
-                message: res.m ? res.m : errorMsg
-              })
-            }
-          }).catch((err) => {
-            this.$message({
-              type: 'warning',
-              message: err.m ? err.m : errorMsg
-            })
+      this.addFlowValidate()
+      if (!this.flag) {
+        if (!this.tableFlag) {
+          this.$message({
+            message: this.msg,
+            type: 'warning'
           })
+        }
+        return false
+      }
+      const data = {
+        id: this.dialogCode.id,
+        configName: this.dialogCode.configName,
+        configValue: this.dialogCode.configValue,
+        configDescription: this.dialogCode.configDescription,
+        configCodeListStr: JSON.stringify(this.codeValueList)
+      }
+      const msg = this.isAddOrEdit ? '添加码表成功' : '修改码表成功'
+      const errorMsg = this.isAddOrEdit ? '添加码表失败' : '修改码表失败'
+      gzbCode.addOrEditCodeTable(this.isAddOrEdit, data).then(response => {
+        const res = response.data
+        if (res.e === '000000') {
+          this.$message({
+            type: 'success',
+            message: res.m ? res.m : msg
+          })
+          this.getConfigCodeList()
+          this.dialogFormVisible = false
         } else {
           this.$message({
             type: 'warning',
-            message: '修改码值失败!'
+            message: res.m ? res.m : errorMsg
           })
         }
-      }).catch(function(err) {
+      }).catch((err) => {
         this.$message({
           type: 'warning',
-          message: err.m ? err.m : '修改码值失败!'
+          message: err.m ? err.m : errorMsg
         })
       })
     },
