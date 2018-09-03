@@ -1,27 +1,20 @@
 <template>
   <div class="codeTableCtrl">
-    <!-- 顶部台南佳和搜索框 -->
     <el-row>
       <el-col :span="24">
         <div class="search_box">
           <el-button type="primary" @click="codeTable('add')" plain>添加</el-button>
-          <el-input class="search_input" 
-            v-model="searchCon"
-            placeholder="请输入内容">
+          <el-input class="search_input" v-model="searchCon" placeholder="请输入内容">
             <el-button slot="append" @click="searchCodeTable" icon="el-icon-search"></el-button>
           </el-input>
         </div>
       </el-col>
     </el-row>
-    <!-- 码表列表 -->
     <el-table
       :data="codeTableList"
       border
       style="width: 100%">
-      <el-table-column
-        label="码表名称"
-        align="center"
-        style="width: 20%;">
+      <el-table-column label="码表名称" align="center" style="width: 20%;">
         <template slot-scope="scope">
           <el-input type="hidden" v-model="scope.row.id"> </el-input>
           {{scope.row.configName}}
@@ -180,47 +173,10 @@ export default {
   components: { },
   name: 'codeTableCtrl',
   data() {
-    const validateConfigName = (rule, value, callback) => {
-      if ((/\d/.test(value))) {
-        callback(new Error('码表名称不能有数子'))
-      } else if (!value || value.trim().length <= 0) {
-        callback(new Error('码表名称不能为空!'))
-      } else {
-        callback()
-      }
-    }
-    const validateConfigValue = (rule, value, callback) => {
-      console.log(value)
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码表值不能为空!'))
-      } else {
-        callback()
-      }
-    }
-    const validateConfigDescription = (rule, value, callback) => {
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码表描述不能为空'))
-      } else {
-        callback()
-      }
-    }
-    const validateCodeValue = (rule, value, callback) => {
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码值名称不能为空'))
-      } else {
-        callback()
-      }
-    }
-    const validateCcodeDescription = (rule, value, callback) => {
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('码值名称不能为空'))
-      } else {
-        callback()
-      }
-    }
     return {
       searchCon: '', // 搜索框内容
       codeTableList: [], // ⭐码表列表数据
+      count: 0, // 码表总条数
       dialogTit: '', // 弹出框的标题
       showStatus: true, // 弹出框底部按钮是否显示
       dialogFormVisible: false, // 弹出框是否显示
@@ -230,7 +186,7 @@ export default {
       codeValueList: [], // ⭐码值列表数据
       isAddOrEdit: true, // 用来区分是增加码表还是编辑码值， true是增加码表，false是编辑码值
       // ⭐⭐码值数据格式，用来增加码值时候用
-      baseCodeVal: {
+      baeeCodeVal: {
         codeDescription: '',
         codeName: '',
         codeOrder: 1,
@@ -258,11 +214,11 @@ export default {
       dialogPageSizes: [10, 20, 30, 40, 50],
       // 添加码表页面表单验证
       validateCodeTable: {
-        configName: [{ required: true, trigger: 'blur', validator: validateConfigName }],
-        configValue: [{ required: true, trigger: 'blur', validator: validateConfigValue }],
-        configDescription: [{ required: true, trigger: 'blur', validator: validateConfigDescription }],
-        codeValue: [{ required: true, trigger: 'blur', validator: validateCodeValue }],
-        codeDescription: [{ required: true, trigger: 'blur', validator: validateCcodeDescription }]
+        // configName: [{ required: true, trigger: 'blur', validator: validateConfigName }],
+        // configValue: [{ required: true, trigger: 'blur', validator: validateConfigValue }],
+        // configDescription: [{ required: true, trigger: 'blur', validator: validateConfigDescription }],
+        // codeValue: [{ required: true, trigger: 'blur', validator: validateCodeValue }],
+        // codeDescription: [{ required: true, trigger: 'blur', validator: validateCcodeDescription }]
         // password: [{ required: true, trigger: 'blur', validator: validatePassword }] }
       }
     }
@@ -297,7 +253,7 @@ export default {
      * 新增码值
      */
     addCodeValue() {
-      this.codeValueList.push(Object.assign({}, this.baseCodeVal))
+      this.codeValueList.push(Object.assign({}, this.baeeCodeVal))
     },
     /**
      * 获取码表列表
@@ -405,24 +361,13 @@ export default {
       const _this = this
       let confimTit = '确定要删除该码表吗？'
       let confimCon = '永久将删除哦，您确定吗？'
-      let isDelCodeTable = true
+      let isDelRoleTable = true
+      const isDelCodeTable = true
+      console.log(isDelRoleTable, isDelCodeTable)
       if (status === 'codeTable') {
         confimTit = '确定要删除该码表吗？'
         confimCon = row.configName
-        isDelCodeTable = true
-      } else if (status === 'codeValue') {
-        if (_this.codeValueList.length === 1) {
-          _this.$message({
-            type: 'warning',
-            message: '至少保留一个码值!'
-          })
-          return false
-        } else {
-          confimTit = '确定要删除该码值吗？'
-        }
-        // isNewAdd
-        confimCon = row.codeName
-        isDelCodeTable = false
+        isDelRoleTable = true
       }
       _this.$confirm(confimCon, confimTit, {
         confirmButtonText: '确定',
@@ -488,7 +433,6 @@ export default {
     * 确认 增加/编辑，码表、 码值
     * */
     addOrEditCodeTable() {
-      // const _this = this
       // 表单验证
       this.$refs.codeTableRefs.validate(valid => {
         if (valid) {
@@ -522,31 +466,17 @@ export default {
               message: err.m ? err.m : errorMsg
             })
           })
-          // ===========
-          // gzbCode.addOrEditCodeTable(this.isAddOrEdit, data).then((response) {
-          //   const res = response.data
-          //   if (res.e === '000000') {
-          //     this.$message({
-          //       type: 'success',
-          //       message: res.m ? res.m : '修改码值成功!'
-          //     })
-          //     this.getConfigCodeList()
-          //     this.dialogFormVisible = false
-          //   } else {
-          //     this.$message({
-          //       type: 'warning',
-          //       message: res.m ? res.m : '修改码值失败!'
-          //     })
-          //   }
-          // }).catch((err) => {
-          //   this.$message({
-          //     type: 'warning',
-          //     message: err.m ? err.m : '修改码值失败!'
-          //   })
-          // })
         } else {
-          return false
+          this.$message({
+            type: 'warning',
+            message: '修改码值失败!'
+          })
         }
+      }).catch(function(err) {
+        this.$message({
+          type: 'warning',
+          message: err.m ? err.m : '修改码值失败!'
+        })
       })
     },
     /**
@@ -572,18 +502,9 @@ export default {
 </script>
 <style scoped>
 .codeTableCtrl {
-  position: relative;
-  padding: 30px 20px 20px;
-  /* height: calc(100vh - 84px); */
-  overflow: auto;
+  padding: 0 20px;
+  padding-top: 30px;
 }
-/* .pagination_box {
-  position: fixed;
-  left: 0;
-  bottom: -0px;
-  height: 50px;
-  margin: 10px 0;
-} */
 .search_box {
   height: 60px;
   line-height: 60px;
@@ -603,17 +524,7 @@ export default {
   width: 100px;
   text-align: center;
 }
-.el-dialog__body {
-  height: auto;
-}
 .dialog_footer {
   text-align: center;
 }
-.codeTableCtrl >>> .el-form-item__content {
-  height: 50px;
-}
-.codeTableCtrl >>> .code_value_table .el-form-item__content {
-  height: auto;
-}
-
 </style>
