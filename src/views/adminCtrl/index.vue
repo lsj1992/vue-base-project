@@ -22,6 +22,7 @@
     <el-table
       :data="adminTableList"
       border
+      @selection-change="handleSelectionChange"
       style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
@@ -194,16 +195,30 @@ export default {
     },
     deleteRoleTable(row) {
       const data = {
-        id: row.sumRoleId
+      }
+      let isList = true
+      if (Array.isArray(row)) {
+        data.ids = row.join()
+        isList = true
+      } else {
+        data.id = row.sumRoleId
+        isList = false
       }
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        gzbAdmin.deleteRoleTable(data).then((response) => {
+        gzbAdmin.deleteRoleTable(isList, data).then((response) => {
           const res = response.data
-          this.adminTableList.splice(this.adminTableList.findIndex(item => item.sumRoleId === row.sumRoleId), 1)
+          if (isList) {
+            row.forEach(item => {
+              this.adminTableList.splice(this.adminTableList.findIndex(items => items.sumRoleId === item.sumRoleId), 1)
+            })
+          } else {
+            this.adminTableList.splice(this.adminTableList.findIndex(item => item.sumRoleId === row.sumRoleId), 1)
+          }
+
           if (res.e === '1') {
             this.$message({
               type: 'success',
@@ -230,6 +245,16 @@ export default {
     },
     batchDel() {
       this.deleteRoleTable(this.selectIds)
+    },
+    handleSelectionChange(rows) {
+      this.multipleSelection = rows
+      // this.select_order_number = this.multipleSelection.length
+      this.selectIds = []
+      if (rows) {
+        this.multipleSelection.map((item) => {
+          this.selectIds.push(item.sumRoleId)
+        })
+      }
     },
     roleTable(status) {
       const _this = this
