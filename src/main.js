@@ -16,25 +16,30 @@ import store from './store'
 import './icons' // icon
 import './errorLog'// error log
 import './permission' // permission control
-import './mock' // simulation data
-import '@/directive/dialog' // 给elementUI的dialog上加上 v-dialogDrag 指令就可以实现弹窗的全屏和拉伸了
 
-import VeeValidate, { Validator } from 'vee-validate'
-import zh_CN from 'vee-validate/dist/locale/zh_CN'
+// import './mock' // simulation data
 
-Validator.localize('zh_CN', zh_CN)
+// import '@/directive/dialog' // 给elementUI的dialog上加上 v-dialogDrag 指令就可以实现弹窗的全屏和拉伸了
 
-const config = {
-  errorBagName: 'errors', // change if property conflicts.
-  fieldsBagName: 'fieldBags',
-  locale: 'zh_CN',
-  delay: 0,
-  events: 'blur|input',
-  messages: null,
-  strict: true
-}
-// 表单验证 可选
-Vue.use(VeeValidate, config)
+/**
+ * 表单验证插件，可以用element自带的
+ */
+// import VeeValidate, { Validator } from 'vee-validate'
+// import zh_CN from 'vee-validate/dist/locale/zh_CN'
+
+// Validator.localize('zh_CN', zh_CN)
+
+// const config = {
+//   errorBagName: 'errors', // change if property conflicts.
+//   fieldsBagName: 'fieldBags',
+//   locale: 'zh_CN',
+//   delay: 0,
+//   events: 'blur|input',
+//   messages: null,
+//   strict: true
+// }
+// // 表单验证 可选
+// Vue.use(VeeValidate, config)
 
 // 图片查看
 const option = {

@@ -36,7 +36,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
-import header from '@/assets/header_images/header.gif'
+import header from '@/assets/header_images/header.svg'
 export default {
   components: {
     Breadcrumb,
