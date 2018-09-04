@@ -102,11 +102,13 @@
               >
             </el-switch>
         </el-form-item>
-        <el-form-item prop="discrible" class="flow_desc" label="工作流描述">
+        <el-form-item prop="discrible" class="form_label" label="工作流描述">
           <el-input
             type="textarea"
             name="discrible"
-            :autosize="{ minRows: 3}"
+            :autosize="{ minRows: 3,maxRows:5}"
+            resize="none"
+            maxlength="200"
             v-model="detailFlowData.discrible">
           </el-input>
         </el-form-item>
@@ -248,15 +250,15 @@
       </el-form>
       <!-- 内部弹窗用来添加角色 -->
       <el-dialog
-        width="80%"
+        width="50%"
         title="添加角色"
         :visible.sync="innerDialogVisible"
         append-to-body>
-        <addRule ref="innerDialog" :roluData="{}"></addRule>
+        <addRule ref="innerDialog" :ruleData="{}"></addRule>
         <div slot="footer" class="dialog_footer">
-        <el-button @click="innerDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addRuleBtn">确 定</el-button>
-      </div>
+          <el-button @click="innerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addRuleBtn">确 定</el-button>
+        </div>
       </el-dialog>
       <!-- 列表 底部 开始-->
       <div slot="footer" class="dialog_footer">
@@ -270,7 +272,7 @@
 <script>
 import * as gzbFlow from '@/api/gzb_flow'
 import { http } from '@/utils/request'
-import addRule from './component/addRule'
+import addRule from '@/components/addRule'
 export default {
   components: {
     addRule
@@ -280,6 +282,8 @@ export default {
     const validateFlowName = (rule, value, callback) => {
       if (!value || value.trim().length <= 0) {
         callback(new Error('工作流名称不能为空'))
+      } else if (!/^[a-zA-Z\u4e00-\u9fa5]+$/.test(value.trim())) {
+        callback(new Error('工作流名称只能是汉字和字母'))
       } else {
         callback()
       }
@@ -785,12 +789,16 @@ export default {
 .add_image_form {
   padding: 50px;
 }
-.flow_desc >>> .el-form-item__label {
+.form_label >>> .el-form-item__label {
   padding: 0 20px;
   text-align: center;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   margin-bottom: 20px;
+  font-weight: 400;
+}
+.form_label >>> .el-form-item__label::before {
+  display: none;
 }
 .dialog_footer {
   text-align: center;

@@ -98,7 +98,9 @@
             placeholder="请输图片描述"
             v-model="uploadData.picDesc"
             type="textarea"
-            :autosize="{ minRows: 5}">
+            :autosize="{ minRows: 3,maxRows:5}"
+            resize="none"
+            maxlength="200">
           </el-input>
         </el-form-item>
       </el-form>

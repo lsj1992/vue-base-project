@@ -100,7 +100,9 @@
         <el-form-item class="flow_desc" label="工作流描述">
           <el-input
             type="textarea"
-            :autosize="{ minRows: 3}"
+            :autosize="{ minRows: 3,maxRows:5}"
+            resize="none"
+            maxlength="200"
             v-model="detailFlowData.discrible">
           </el-input>
         </el-form-item>

@@ -12,10 +12,6 @@
                 <el-button slot="append" icon="el-icon-search" @click="searchRoleTable"></el-button>
               </el-input>
             </el-col>
-          <!-- <el-button type="primary" @click="roleTable('add')" plain>添加</el-button>
-          <el-input class="search_input" v-model="searchRole" placeholder="请输入内容">
-            <el-button slot="append" @click="searchRoleTable" icon="el-icon-search"></el-button>
-          </el-input> -->
         </div>
       </el-col>
     </el-row>
@@ -28,7 +24,6 @@
       </el-table-column>
       <el-table-column label="角色名称" align="center" style="width: 20%;">
         <template slot-scope="scope">
-          <el-input type="hidden" v-model="scope.row.id"> </el-input>
           {{scope.row.sumRoleName}}
         </template>
       </el-table-column>
@@ -56,6 +51,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
      <el-pagination
       background
       @size-change="handleSizeChange"
@@ -66,56 +62,27 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-    <el-dialog class="add_role_table" :title="dialogTit" :fullscreen="fullscreen" :visible.sync="dialogFormVisible">
-    <el-form class="add_role_form" :model="dialogRole">
-      <el-form-item>                 
-        <el-input style="width: 40%; margin-right: 25px;" placeholder="请输入角色名称" name="sumRoleName" v-model="dialogRole.sumRoleName">
-          <template slot="prepend">角色名称</template>
-        </el-input>
-        <el-switch
-              v-model="dialogRole.sumRoleStatus"
-              active-text="启用"
-              inactive-text="禁用"
-              @change="changeRoleStatus()"
-              >
-            </el-switch>
-        <!-- <el-input v-model="dialogCode.configName" :disabled="disabled" auto-complete="off"></el-input> -->
-      </el-form-item>
-      <el-form-item >
-        <el-input style="width: 40%; margin-right: 25px;" placeholder="请输入第三方应用"  v-model="dialogRole.sumRoleApp" >
-          <template slot="prepend" style="width:200px">第三方应用</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item 
-        label="角色类别"
-        align="center"
-        style="width: 25%">
-        <template>
-          <el-select v-model="dialogRole.sumRoleType" placeholder="请选择">
-            <el-option label="工作流" value="0"></el-option>
-            <el-option label="菜单" value="1"></el-option>
-          </el-select>
-        </template>
-      </el-form-item>
-      <el-form-item class="flow_desc" label="角色描述">
-           <el-input
-            type="textarea"
-            :autosize="{ minRows: 3}"
-            v-model="dialogRole.sumRoleDesc">
-          </el-input>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" v-show="showStatus" class="dialog_footer">
-      <el-button @click="dialogFormVisible = false">取 消</el-button>
-      <el-button type="primary" @click="addOrEditRoleTable">确 定</el-button>
-    </div>
-  </el-dialog>
+    <!-- 新的弹窗 -->
+    <el-dialog
+      width="50%"
+      title="添加角色"
+      :visible.sync="dialogFormVisible"
+      append-to-body>
+      <addRule ref="addRule" :ruleData="dialogRole"></addRule>
+      <div slot="footer" class="dialog_footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addOrEditRoleTable">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 import * as gzbAdmin from '@/api/gzb_admin'
+import addRule from '@/components/addRule'
 export default {
-  components: { },
+  components: {
+    addRule
+  },
   name: 'adminCtrl',
   data() {
     return {
@@ -147,8 +114,20 @@ export default {
     this.getSumRoleList()
   },
   methods: {
-    handleCurrentChange() {},
-    handleSizeChange() {},
+    /**
+     * 切换每页显示条数
+     */
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getSumRoleList()
+    },
+    /**
+     * 跳转，上一页上一页
+     */
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.getSumRoleList()
+    },
     searchRoleTable() {
       if (this.searchRole === '') {
         this.$message({
@@ -174,22 +153,21 @@ export default {
         const res = response.data
         if (res.e === '000000') {
           this.dialogRole = res.d
+          console.log(this.dialogRole)
           this.dialogRole.sumRoleStatus = this.dialogRole.sumRoleStatus === 0
-          this.dialogRole.sumRoleType = this.dialogRole.sumRoleType.toString()
         }
       })
     },
     getSumRoleList() {
-      const _this = this
       const data = {
-        page: _this.currentPage,
-        pageSize: _this.pageSize
+        page: this.currentPage,
+        pageSize: this.pageSize
       }
-      gzbAdmin.getSumRoleList(data).then(function(response) {
+      gzbAdmin.getSumRoleList(data).then((response) => {
         const res = response.data
         if (res.code === '000000') {
-          _this.$set(_this, 'adminTableList', res.data)
-          _this.total = res.count
+          this.$set(this, 'adminTableList', res.data)
+          this.total = res.count
         }
       })
     },
@@ -230,13 +208,13 @@ export default {
               message: res.m ? res.m : '删除失败!'
             })
           }
-        }).catch(function(err) {
+        }).catch((err) => {
           this.$message({
             type: 'error',
             message: err.m ? err.m : '删除失败!'
           })
         })
-      }).catch(function() {
+      }).catch(() => {
         this.$message({
           type: 'info',
           message: '已取消删除'
@@ -248,7 +226,6 @@ export default {
     },
     handleSelectionChange(rows) {
       this.multipleSelection = rows
-      // this.select_order_number = this.multipleSelection.length
       this.selectIds = []
       if (rows) {
         this.multipleSelection.map((item) => {
@@ -257,56 +234,54 @@ export default {
       }
     },
     roleTable(status) {
-      const _this = this
-      _this.dialogFormVisible = true
-      _this.disabled = false
-      _this.dialogRole = {}
+      this.dialogFormVisible = true
+      this.disabled = false
+      this.dialogRole = {}
       if (status === 'edit') {
-        _this.getRoleValue()
-        _this.dialogTit = '编辑角色'
-        _this.disabled = false
-        _this.showStatus = true
-        _this.isAddOrEdit = false
+        this.getRoleValue()
+        this.dialogTit = '编辑角色'
+        this.disabled = false
+        this.showStatus = true
+        this.isAddOrEdit = false
       } else if (status === 'add') {
-        _this.dialogTit = '添加角色'
-        _this.dialogRole = {}
-        _this.roleValueList = []
-        _this.roleValueList.push(Object.assign({}, _this.baeeRoleVal))
-        _this.disabled = false
-        _this.showStatus = true
-        _this.isAddOrEdit = true
+        this.dialogTit = '添加角色'
+        this.dialogRole = {}
+        this.roleValueList = []
+        this.roleValueList.push(Object.assign({}, this.baeeRoleVal))
+        this.disabled = false
+        this.showStatus = true
+        this.isAddOrEdit = true
       }
     },
     /**
     * 确认 增加/编辑，码表、 码值
     * */
     addOrEditRoleTable() {
-      const _this = this
+      this.dialogRole = this.$refs.addRule.newRuleData
       const data = {
-        sumRoleName: _this.dialogRole.sumRoleName,
-        sumRoleDesc: _this.dialogRole.sumRoleDesc,
-        sumRoleType: _this.dialogRole.sumRoleType,
-        sumRoleApp: _this.dialogRole.sumRoleApp,
-        sumRoleStatus: _this.dialogRole.sumRoleStatus ? 0 : 1
+        sumRoleName: this.dialogRole.sumRoleName,
+        sumRoleDesc: this.dialogRole.sumRoleDesc,
+        sumRoleType: this.dialogRole.sumRoleType,
+        sumRoleApp: this.dialogRole.sumRoleApp,
+        sumRoleStatus: this.dialogRole.sumRoleStatus ? 0 : 1
       }
-      console.log(data)
-      gzbAdmin.addOrEditRoleTable(_this.isAddOrEdit, data).then(function(response) {
+      gzbAdmin.addOrEditRoleTable(this.isAddOrEdit, data).then((response) => {
         const res = response.data
         if (res.e === '000000') {
-          _this.$message({
+          this.$message({
             type: 'success',
             message: res.m ? res.m : '修改角色成功!'
           })
-          _this.getSumRoleList()
-          _this.dialogFormVisible = false
+          this.getSumRoleList()
+          this.dialogFormVisible = false
         } else {
-          _this.$message({
+          this.$message({
             type: 'warning',
             message: res.m ? res.m : '修改角色失败!'
           })
         }
-      }).catch(function(err) {
-        _this.$message({
+      }).catch((err) => {
+        this.$message({
           type: 'warning',
           message: err.m ? err.m : '修改角色失败!'
         })

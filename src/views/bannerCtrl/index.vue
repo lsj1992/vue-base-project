@@ -69,8 +69,9 @@
           <el-input 
             placeholder="请输banner描述"
             v-model="detailBannerData.bannerDesc"
-            type="textarea"
-            :autosize="{minRows:3}"
+            :autosize="{ minRows: 3,maxRows:5}"
+            resize="none"
+            maxlength="200"
             :disabled="disabled">
           </el-input>
         </el-form-item>

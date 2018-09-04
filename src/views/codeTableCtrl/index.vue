@@ -66,13 +66,19 @@
           <el-input type="hidden" v-model="dialogCode.id"></el-input>
         </el-form-item>
         <el-form-item prop="configValue">
-          <el-input placeholder="请输入码表值" name="configValue" @keyup.up="replaceChanese" v-model.trim="dialogCode.configValue" :disabled="disabled">
+          <el-input placeholder="请输入码表值" name="configValue" v-model.trim="dialogCode.configValue" :disabled="disabled">
             <template slot="prepend" style="width:200px">码表值</template>
           </el-input>
         </el-form-item>
-        <el-form-item prop="configDescription">
-          <el-input placeholder="请输入码表描述" name="configDescription" v-model.trim="dialogCode.configDescription" :disabled="disabled">
-            <template slot="prepend">码表描述</template>
+        <el-form-item prop="configDescription" class="form_label" label="码表描述">
+          <el-input
+            type="textarea"
+            name="configDescription"
+            :autosize="{ minRows: 3,maxRows:5}"
+            resize="none"
+            maxlength="200"
+            :disabled="disabled"
+            v-model="dialogCode.configDescription">
           </el-input>
         </el-form-item>
         <!-- 码值列表 开始-->
@@ -145,18 +151,6 @@
             </el-table-column>
           </el-table>
         </el-form-item>
-        <!-- 后台没有分页 -->
-         <!-- <el-pagination
-          class="pagination_box"
-          background
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="dialogCurrentPage"
-          :page-sizes="dialogPageSizes"
-          :page-size="dialogPageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="dialogTotal">
-        </el-pagination> -->
       </el-form>
       <!-- 列表 底部 开始-->
       <div slot="footer" v-show="showStatus" class="dialog_footer">
@@ -176,6 +170,8 @@ export default {
     const validateConfigName = (rule, value, callback) => {
       if (!value || value.trim().length <= 0) {
         callback(new Error('码表名不能为空'))
+      } else if (!/^[a-zA-Z\u4e00-\u9fa5]+$/g.test(value.trim())) {
+        callback(new Error('码表名称只能是汉字和字母'))
       } else {
         callback()
       }
@@ -183,6 +179,8 @@ export default {
     const validateConfigValue = (rule, value, callback) => {
       if (!value || value.trim().length <= 0) {
         callback(new Error('码表值不能为空'))
+      } else if (!/^[a-zA-Z0-9]+$/.test(value.trim())) {
+        callback(new Error('码表值只能是数字或字母'))
       } else {
         callback()
       }
@@ -252,12 +250,6 @@ export default {
     this.getConfigCodeList()
   },
   methods: {
-    /**
-     * 替换中文
-     */
-    replaceChanese() {
-      this.dialogCode.configValue.replace(/[\/u0391\-\/uFFE5]/gi, '')
-    },
     /**
      * 搜索功能
      */
@@ -464,17 +456,27 @@ export default {
         } else {
           this.tableFlag = true
           this.codeValueList.map((item, index) => {
-            if (item.codeValue === '') {
+            if (item.codeValue.trim() === '') {
               this.msg = '码值不能为空'
               this.tableFlag = false
               this.flag = false
               return false
-            } else if (item.codeName === '') {
+            } else if (!/^[a-zA-Z0-9]+$/.test(item.codeValue.trim())) {
+              this.msg = '码值只能是数字和字母'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            } else if (item.codeName.trim() === '') {
               this.msg = '码值名称不能为空'
               this.tableFlag = false
               this.flag = false
               return false
-            } else if (item.codeDescription === '') {
+            } else if (!/^[a-zA-Z\u4e00-\u9fa5]+$/g.test(item.codeName.trim())) {
+              this.msg = '码值名称只能字母或汉字'
+              this.tableFlag = false
+              this.flag = false
+              return false
+            } else if (item.codeDescription.trim() === '') {
               this.msg = '码值描述不能为空'
               this.tableFlag = false
               this.flag = false
@@ -578,5 +580,22 @@ export default {
 }
 .dialog_footer {
   text-align: center;
+}
+.form_label >>> .el-form-item__label {
+  padding: 0 20px;
+  text-align: center;
+  border: 1px solid #dcdfe6;
+  width: 100px;
+  text-align: center;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 20px;
+  font-weight: 400;
+  color: #909399;
+  background: #f5f7fa;
+}
+.form_label >>> .el-form-item__label::before {
+  display: none;
+  content: '';
 }
 </style>
