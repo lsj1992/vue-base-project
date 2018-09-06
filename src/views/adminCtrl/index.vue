@@ -198,19 +198,19 @@ export default {
       }).then(() => {
         gzbAdmin.deleteRoleTable(isList, data).then((response) => {
           const res = response.data
-          if (isList) {
-            row.forEach(item => {
-              this.adminTableList.splice(this.adminTableList.findIndex(items => items.sumRoleId === item.sumRoleId), 1)
-            })
-          } else {
-            this.adminTableList.splice(this.adminTableList.findIndex(item => item.sumRoleId === row.sumRoleId), 1)
-          }
-
-          if (res.e === '1') {
+          if (res.e === '000000') {
             this.$message({
               type: 'success',
               message: '删除角色!'
             })
+            if (isList) {
+              row.forEach(item => {
+                this.adminTableList.splice(this.adminTableList.findIndex(items => items.sumRoleId === item.sumRoleId), 1)
+              })
+            } else {
+              this.adminTableList.splice(this.adminTableList.findIndex(item => item.sumRoleId === row.sumRoleId), 1)
+            }
+            this.total = this.adminTableList.length
           } else {
             this.$message({
               type: 'warning',
