@@ -205,13 +205,28 @@ export default {
         userId: leftArr.join(),
         role: 0
       }
-      if (data.roleId === '' || data.groupId === '') {
+      if (data.groupId === '' || data.groupId === undefined) {
         this.$message({
           type: 'warning',
-          message: '不能为空！'
+          message: '班组不能为空！'
         })
         return false
       }
+      if (data.flowId === '' || data.flowId === undefined) {
+        this.$message({
+          type: 'warning',
+          message: '名称不能为空！'
+        })
+        return false
+      }
+      if (data.userId === '' || data.userId === undefined) {
+        this.$message({
+          type: 'warning',
+          message: '角色不能为空！'
+        })
+        return false
+      }
+      // data.groupId
       gzbRule.addMember(data).then((response) => {
         const res = response.data
         if (res.e === '000000') {

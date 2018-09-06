@@ -62,10 +62,10 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-    <!-- 新的弹窗 -->
+    <!-- 新的弹窗   title="添加角色"-->
     <el-dialog
       width="50%"
-      title="添加角色"
+      :title="dialogTit"
       :visible.sync="dialogFormVisible"
       append-to-body>
       <addRule ref="addRule" :ruleData="dialogRole"></addRule>
@@ -198,19 +198,19 @@ export default {
       }).then(() => {
         gzbAdmin.deleteRoleTable(isList, data).then((response) => {
           const res = response.data
-          if (isList) {
-            row.forEach(item => {
-              this.adminTableList.splice(this.adminTableList.findIndex(items => items.sumRoleId === item.sumRoleId), 1)
-            })
-          } else {
-            this.adminTableList.splice(this.adminTableList.findIndex(item => item.sumRoleId === row.sumRoleId), 1)
-          }
-
-          if (res.e === '1') {
+          if (res.e === '000000') {
             this.$message({
               type: 'success',
               message: '删除角色!'
             })
+            if (isList) {
+              row.forEach(item => {
+                this.adminTableList.splice(this.adminTableList.findIndex(items => items.sumRoleId === item.sumRoleId), 1)
+              })
+            } else {
+              this.adminTableList.splice(this.adminTableList.findIndex(item => item.sumRoleId === row.sumRoleId), 1)
+            }
+            this.total = this.adminTableList.length
           } else {
             this.$message({
               type: 'warning',
