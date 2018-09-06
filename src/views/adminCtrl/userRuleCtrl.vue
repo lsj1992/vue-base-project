@@ -205,7 +205,7 @@ export default {
         userId: leftArr.join(),
         role: 0
       }
-      if (data.roleId === '' || data.groupId === '') {
+      if (data.roleId === '') {
         this.$message({
           type: 'warning',
           message: '不能为空！'

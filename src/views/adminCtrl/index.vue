@@ -62,10 +62,10 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-    <!-- 新的弹窗 -->
+    <!-- 新的弹窗   title="添加角色"-->
     <el-dialog
       width="50%"
-      title="添加角色"
+      :title="dialogTit"
       :visible.sync="dialogFormVisible"
       append-to-body>
       <addRule ref="addRule" :ruleData="dialogRole"></addRule>
