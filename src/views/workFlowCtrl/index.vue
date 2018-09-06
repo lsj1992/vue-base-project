@@ -300,7 +300,7 @@ export default {
       teamList: [], // 分组列表【select下拉框中的值】
       fuzzyQueryName: '', // 模糊查询
       flowList: [], // 查询出的工作流 列表
-      currentPage: 1,
+      currentPage: 0,
       pageSizes: [10, 20, 30, 40, 50],
       pageSize: 10,
       total: 0,
@@ -405,7 +405,7 @@ export default {
     getFlowList() {
       const data = {
         pageSize: this.pageSize,
-        page: this.currentPage,
+        page: this.currentPage === 0 ? 1 : this.currentPage,
         flowName: this.fuzzyQueryName
       }
       gzbFlow.getFlowList(data).then(response => {
@@ -717,14 +717,14 @@ export default {
      */
     handleSizeChange(val) {
       this.pageSize = val
-      this.showPicture()
+      this.getFlowList()
     },
     /**
      * 跳转，上一页上一页
      */
     handleCurrentChange(val) {
       this.currentPage = val
-      this.showPicture()
+      this.getFlowList()
     },
     /**
      * 增加角色
