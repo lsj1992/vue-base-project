@@ -143,6 +143,27 @@ export default {
           }
         })
       })
+    },
+    updateRule() {
+      const data = {
+        sumRoleName: this.newRuleData.sumRoleName,
+        sumRoleDesc: this.newRuleData.sumRoleDesc,
+        sumRoleType: this.newRuleData.sumRoleType,
+        sumRoleApp: this.newRuleData.sumRoleApp,
+        sumRoleStatus: this.newRuleData.sumRoleStatus ? 0 : 1
+      }
+      return new Promise((resolve, reject) => {
+        this.$refs.addRuleValidate.validate((valid) => {
+          if (valid) {
+            addGzbSumRole(data).then((response) => {
+              const res = response.data
+              resolve(res)
+            }).catch(err => {
+              reject(err)
+            })
+          }
+        })
+      })
     }
   },
   mounted() {

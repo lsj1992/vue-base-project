@@ -46,7 +46,7 @@
         align="center"
         style="width: 20%">
         <template slot-scope="scope">
-          <el-button @click="getRoleValue(scope.row)" type="primary" size="small">编辑</el-button>
+          <el-button @click="roleTable('edit', scope.row)" type="primary" size="small">编辑</el-button>
           <el-button @click="deleteRoleTable(scope.row)" type="danger" size="small">删除</el-button>
         </template>
       </el-table-column>
@@ -242,12 +242,12 @@ export default {
         })
       }
     },
-    roleTable(status) {
+    roleTable(status, row) {
       this.dialogFormVisible = true
       this.disabled = false
       this.dialogRole = {}
       if (status === 'edit') {
-        this.getRoleValue()
+        this.getRoleValue(row)
         this.dialogTit = '编辑角色'
         this.disabled = false
         this.showStatus = true
@@ -276,6 +276,9 @@ export default {
       }
       if (!this.$refs.addRule.intercept()) {
         return false
+      }
+      if (!this.isAddOrEdit) {
+        data.sumRoleId = this.dialogRole.sumRoleId
       }
       gzbAdmin.addOrEditRoleTable(this.isAddOrEdit, data).then((response) => {
         const res = response.data
