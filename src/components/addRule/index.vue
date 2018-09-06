@@ -114,6 +114,15 @@ export default {
   },
   methods: {
     changeFlowStatus() {},
+    intercept() {
+      this.$refs.addRuleValidate.validate((valid) => {
+        if (valid) {
+          return true
+        } else {
+          return false
+        }
+      })
+    },
     addRule() {
       const data = {
         sumRoleName: this.newRuleData.sumRoleName,

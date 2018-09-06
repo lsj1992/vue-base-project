@@ -274,6 +274,9 @@ export default {
         sumRoleApp: this.dialogRole.sumRoleApp,
         sumRoleStatus: this.dialogRole.sumRoleStatus ? 0 : 1
       }
+      if (!this.$refs.addRule.intercept()) {
+        return false
+      }
       gzbAdmin.addOrEditRoleTable(this.isAddOrEdit, data).then((response) => {
         const res = response.data
         if (res.e === '000000') {
