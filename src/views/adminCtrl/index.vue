@@ -274,7 +274,9 @@ export default {
         sumRoleApp: this.dialogRole.sumRoleApp,
         sumRoleStatus: this.dialogRole.sumRoleStatus ? 0 : 1
       }
-      console.log(this.isAddOrEdit)
+      if (!this.$refs.addRule.intercept()) {
+        return false
+      }
       if (!this.isAddOrEdit) {
         data.sumRoleId = this.dialogRole.sumRoleId
       }
