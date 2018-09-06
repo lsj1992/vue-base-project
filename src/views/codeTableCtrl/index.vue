@@ -45,6 +45,7 @@
     </el-table>
     <!-- 码表分页 -->
     <el-pagination
+      v-show="showPagination"
       class="pagination_box"
       background
       @size-change="handleSizeChange"
@@ -220,6 +221,7 @@ export default {
        * ⭐⭐⭐分页数据
        * */
       currentPage: 1, // 当前第几页
+      showPagination: true,
       total: 0, // 总共多少页
       page: 1, // 页码
       pageSizes: [10, 20, 30, 40, 50],
@@ -283,6 +285,11 @@ export default {
         if (res.code === 0) {
           this.codeTableList = res.data
           this.total = res.count
+          if (this.total === 0) {
+            this.showPagination = false
+          } else {
+            this.showPagination = true
+          }
         } else if (res.e === '1000015') {
           this.$message({
             message: res.m ? res.m : '获取码表失败！',
@@ -313,6 +320,11 @@ export default {
         if (res.e === '000000') {
           this.total--
           this.codeTableList.splice(this.codeTableList.findIndex(item => item.id === row.id), 1)
+          if (this.total === 0) {
+            this.showPagination = false
+          } else {
+            this.showPagination = true
+          }
           if (res.e === '1') {
             this.$message({
               type: 'success',

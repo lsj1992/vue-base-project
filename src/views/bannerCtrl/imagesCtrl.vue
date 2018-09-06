@@ -58,6 +58,7 @@
     </el-table>
     <!-- 图片列表的分页 -->
     <el-pagination
+      v-show="showPagination"
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -123,6 +124,7 @@ export default {
   data() {
     return {
       imagesTableList: [],
+      showPagination: true,
       total: 0,
       pageSize: 10,
       pageSizes: [10, 20, 30, 40, 50],
@@ -175,6 +177,11 @@ export default {
           console.log(item.picStatus)
         })
         this.total = res.count
+        if (this.total === 0) {
+          this.showPagination = false
+        } else {
+          this.showPagination = true
+        }
         this.dialogFormVisible = false
       } else if (res.e === '1000015') {
         this.$message({
@@ -235,6 +242,11 @@ export default {
             console.log(item.picStatus)
           })
           this.total = res.count
+          if (this.total === 0) {
+            this.showPagination = false
+          } else {
+            this.showPagination = true
+          }
         } else if (res.e === '1000015') {
           this.$message({
             message: res.m ? res.m : '获取图片列表失败！',

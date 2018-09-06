@@ -53,6 +53,7 @@
     </el-table>
     <!-- 分页 -->
      <el-pagination
+      v-show="showPagination"
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -97,6 +98,7 @@ export default {
       fullscreen: true, // 弹出框是否全屏
       isAddOrEdit: true, // 用来区分是增加角色还是编辑角色， true是增加角色，false是编辑角色
       selectIds: [], // 选中行的id
+      showPagination: true, // 是否展示分页组件
       currentPage: 1, // 当前第几页
       total: 0, // 总共多少页
       page: 1, // 页码
@@ -177,6 +179,11 @@ export default {
         if (res.code === '000000') {
           this.$set(this, 'adminTableList', res.data)
           this.total = res.count
+          if (this.total === 0) {
+            this.showPagination = false
+          } else {
+            this.showPagination = true
+          }
         }
       })
     },

@@ -71,6 +71,7 @@
     </el-table>
     <!-- banner列表的分页 -->
     <el-pagination
+      v-show="showPagination"
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -129,6 +130,7 @@ export default {
   },
   data() {
     return {
+      showPagination: true,
       changeSelect: '',
       imgBaseUrl: process.env.files_href
     }
@@ -176,6 +178,13 @@ export default {
   watch: {
     changeSelect(newVal) {
       this.SET_SELECTED_BANNER(newVal)
+    },
+    total(val) {
+      if (val === 0) {
+        this.showPagination = false
+      } else {
+        this.showPagination = true
+      }
     }
   }
 

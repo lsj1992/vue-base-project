@@ -74,7 +74,7 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      v-if="showFlowList"
+      v-if="showPagination"
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -244,6 +244,7 @@ export default {
       teamList: [], // 分组列表【select下拉框中的值】
       fuzzyQuery: '', // 模糊查询
       flowList: [], // 查询出的工作流 列表
+      showPagination: false, // 用来展示分页组件
       showFlowList: false, // 用来控制当前班组下工作流列表的显示隐藏
       currentPage: 1,
       pageSizes: [10, 20, 30, 40, 50],
@@ -353,13 +354,16 @@ export default {
         const res = response.data
         if (res.code === '000000') {
           this.flowList = res.data
-          console.log(this.flowList)
           this.flowList.forEach(item => {
             item.isAvailable = item.isAvailable === 0
           })
-          console.log(this.flowList)
           this.showFlowList = true
           this.total = res.count
+          if (this.total === 0) {
+            this.showPagination = false
+          } else {
+            this.showPagination = true
+          }
         }
       })
     },
