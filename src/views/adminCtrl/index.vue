@@ -158,10 +158,19 @@ export default {
         }
       })
     },
+    // unknown() {
+    //   const data = {
+    //   }
+    //   gzbAdmin.unknown(data).then((response) => {
+    //     const res = response.data
+    //     console.log(res)
+    //   })
+    // },
     getSumRoleList() {
       const data = {
         page: this.currentPage,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        sumRoleName: this.searchRole
       }
       gzbAdmin.getSumRoleList(data).then((response) => {
         const res = response.data

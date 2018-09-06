@@ -11,21 +11,35 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/crm/': {
-        // target: 'http://192.168.3.131:8080/',
-        target: 'http://139.198.17.237/',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/crm/': '/crm/'
-        }
+          target: 'http://192.168.3.131:8080/',
+          // target: 'http://139.198.17.237/',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/crm/': '/crm/'
+          }
       },
       '/gzb/': {
-        // target: 'http://192.168.3.131:8080/',
-        target: 'http://139.198.17.237/',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/gzb/': '/gzb/'
+          target: 'http://192.168.3.131:8080/',
+          // target: 'http://139.198.17.237/',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/gzb/': '/gzb/'
         }
       },
+      '/secret/': {
+        target: 'http://192.168.3.120:81/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/secret/': '/secret/'
+        }
+      },
+      '/site/': {
+        target: 'http://192.168.3.120:81/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/site/': '/site/'
+        }
+      }
     },
 
     // Various Dev Server settings

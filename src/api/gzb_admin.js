@@ -41,3 +41,12 @@ export function addOrEditRoleTable(isRoleTable, data) {
     data
   })
 }
+// export function unknown(data) {
+//   // const url = '/secret/unknown'
+//   const url = '/site/index'
+//   return request({
+//     url: url,
+//     method: 'post',
+//     data
+//   })
+// }

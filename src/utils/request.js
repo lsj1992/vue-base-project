@@ -11,27 +11,30 @@ import qs from 'Qs'
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
   timeout: 5000, // request timeout
-  withCredentials: true // 允许携带cookie
+  withCredentials: false // 允许携带cookie
 })
-function csrfSafeMethod(method) {
-  // these HTTP methods do not require CSRF protection
-  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
-}
-service.defaults.headers['crossDomain'] = false
+// function csrfSafeMethod(method) {
+//   // these HTTP methods do not require CSRF protection
+//   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
+// }
+// service.defaults.headers['crossDomain'] = true
+// service.defaults.headers['Content-Type'] = 'application/json'
+// service.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+// service.defaults.headers['Access-Control-Allow-Origin'] = 'http://192.168.3.114:8080'
 
 service.interceptors.request.use(config => {
   const token = store.getters.token
-  config.headers['x-csrf-token'] = store.getters.CsrfToken
-  // Do something before request is sent
-  if (!csrfSafeMethod(config.method) && !config.headers['crossDomain']) {
-    if (store.getters.CsrfToken) {
-      config.headers['x-csrf-token'] = store.getters.CsrfToken
-    }
-  }
+  // config.headers['x-csrf-token'] = store.getters.CsrfToken
+  // // Do something before request is sent
+  // if (!csrfSafeMethod(config.method) && !config.headers['crossDomain']) {
+  //   if (store.getters.CsrfToken) {
+  //     config.headers['x-csrf-token'] = store.getters.CsrfToken
+  //   }
+  // }
   // 让每个请求携带token-- ['X-Token']为自定义key 请根据实际情况自行修改
-  if (store.getters.token !== undefined) {
-    config.headers['Authorization'] = store.getters.token
-  }
+  // if (store.getters.token !== undefined) {
+  //   config.headers['Authorization'] = store.getters.token
+  // }
   if (config.method === 'get') {
     config.params = {
       token: token,
@@ -39,10 +42,21 @@ service.interceptors.request.use(config => {
     }
   } else {
     const data = qs.parse(config.data)
-    config.data = qs.stringify({
+    config.data = {
       token: token,
       ...data
-    })
+    }
+    config.headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'crossDomain': false
+    }
+    config.transformRequest = [function(data) {
+      let ret = ''
+      for (const it in data) {
+        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+      }
+      return ret.slice(0, -1)
+    }]
   }
   return config
 }, error => {
@@ -50,7 +64,6 @@ service.interceptors.request.use(config => {
   console.log(error) // for debug
   Promise.reject(error)
 })
-
 // respone interceptor
 service.interceptors.response.use(
   // response => response,
@@ -62,6 +75,8 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
+    console.log('=========================')
+    console.log(res)
     if (res.e === '1000015' || res.code === '1000015') {
       Message({
         message: res.m ? res.m : '请先登录！',
@@ -100,6 +115,7 @@ service.interceptors.response.use(
     // }
   },
   error => {
+    console.log('========================-------error---')
     console.log('err' + error) // for debug
     Message({
       message: error.message,
