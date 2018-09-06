@@ -60,7 +60,7 @@ export default {
       this.$store.dispatch('toggleSideBar')
     },
     logout() {
-      this.$store.dispatch('LogOut').then(() => {
+      this.$store.dispatch('FedLogOu').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
     }
