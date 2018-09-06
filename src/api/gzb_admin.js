@@ -31,9 +31,11 @@ export function deleteRoleTable(isList, data) {
 export function addOrEditRoleTable(isRoleTable, data) {
   let url = ''
   if (isRoleTable === true) {
+    // 添加角色
     url = '/crm/sumRole/addGzbSumRole'
   } else {
-    url = '/crm/sumRole/addGzbSumRole'
+    // 编辑角色
+    url = '/crm/sumRole/updateGzbSumRole'
   }
   return request({
     url: url,

@@ -61,7 +61,6 @@ service.interceptors.request.use(config => {
   return config
 }, error => {
   // Do something with request error
-  console.log(error) // for debug
   Promise.reject(error)
 })
 // respone interceptor
@@ -75,8 +74,6 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    console.log('=========================')
-    console.log(res)
     if (res.e === '1000015' || res.code === '1000015') {
       Message({
         message: res.m ? res.m : '请先登录！',
@@ -115,8 +112,6 @@ service.interceptors.response.use(
     // }
   },
   error => {
-    console.log('========================-------error---')
-    console.log('err' + error) // for debug
     Message({
       message: error.message,
       type: 'error',
@@ -125,6 +120,5 @@ service.interceptors.response.use(
     return Promise.reject(error)
   })
 export const http = axios
-// console.log(axios.all)
 export default service
 
