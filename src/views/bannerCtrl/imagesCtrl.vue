@@ -133,6 +133,7 @@ export default {
       // fileUrl: process.env.files_href,
       imgBaseUrl: process.env.files_href,
       uploadData: {
+        uid: 0,
         filename: '',
         token: '',
         picDesc: ''
@@ -155,7 +156,13 @@ export default {
      * 上传到服务器
      */
     submitUpload() {
-      console.log('山川图片------------158行')
+      if (!this.uploadData.uid > 0) {
+        this.$message({
+          type: 'warning',
+          message: '请选择上传图片！'
+        })
+        return false
+      }
       this.uploadData.token = this.token
       // this.uploadData.name = this.token
       this.$refs.uploadImgForm.submit()
@@ -164,7 +171,7 @@ export default {
      * 当选择的图片改变时候触发
      */
     handChange(file) {
-      // console.log(file)
+      this.uploadData.uid = file.uid
     },
     /**
      * 上传成功时调用
@@ -173,6 +180,7 @@ export default {
     uploadSuccess(res) {
       if (res.e === '000000') {
         this.showPicture()
+        this.uploadData.uid = 0
         this.dialogFormVisible = false
       } else if (res.e === '1000015') {
         this.$message({
@@ -230,7 +238,7 @@ export default {
           this.imagesTableList = res.data
           this.imagesTableList.forEach(item => {
             item.picStatus = item.picStatus === 0
-            console.log(item.picStatus)
+            // console.log(item.picStatus)
           })
           this.total = res.count
           if (this.total === 0) {
@@ -271,7 +279,6 @@ export default {
       }
       bannerApi.updatePicture(data).then((response) => {
         const res = response.data
-        console.log(res)
         if (res.code === '000000') {
           this.$message({
             message: res.m ? res.m : '更新图片专题成功！',
