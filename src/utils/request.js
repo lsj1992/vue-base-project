@@ -10,7 +10,7 @@ import qs from 'Qs'
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
-  timeout: 5000, // request timeout
+  timeout: 1000 * 60 * 3, // request timeout
   withCredentials: false // 允许携带cookie
 })
 // function csrfSafeMethod(method) {
