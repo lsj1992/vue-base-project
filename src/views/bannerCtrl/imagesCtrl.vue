@@ -168,13 +168,8 @@ export default {
      *  ⭐⭐⭐⭐⭐注意上传成功和上传失败，返回的对象结构不同，
      */
     uploadSuccess(res) {
-      if (res.code === '000000') {
-        this.imagesTableList = res.data
-        this.imagesTableList.forEach(item => {
-          item.picStatus = item.picStatus === 0
-          console.log(item.picStatus)
-        })
-        this.total = res.count
+      if (res.e === '000000') {
+        this.showPicture()
         this.dialogFormVisible = false
       } else if (res.e === '1000015') {
         this.$message({

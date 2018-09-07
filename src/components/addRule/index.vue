@@ -35,7 +35,7 @@
         </el-select>
       </el-form-item>
       <el-form-item prop="sumRoleApp">
-        <el-input name="sumRoleApp" type="number" min='0' style="width: 312px; margin-right: 25px;" v-model="newRuleData.sumRoleApp">
+        <el-input name="sumRoleApp" type="number" min='1' style="width: 312px; margin-right: 25px;" v-model="newRuleData.sumRoleApp">
           <template slot="prepend">第三方程序</template>
         </el-input>
       </el-form-item>
@@ -73,6 +73,7 @@ export default {
       }
     }
     const validateSumRoleType = (rule, value, callback) => {
+      console.log(value)
       if (value === null || value === undefined) {
         callback(new Error('角色类型不能为空'))
       } else {
@@ -80,8 +81,8 @@ export default {
       }
     }
     const validateSumRoleApp = (rule, value, callback) => {
-      if (!value || value.trim().length <= 0) {
-        callback(new Error('第三方程序不能为空'))
+      if (!value || value <= 0) {
+        callback(new Error('第三方程序不能为空且最小值为1'))
       } else {
         callback()
       }
@@ -116,11 +117,8 @@ export default {
     changeFlowStatus() {},
     intercept() {
       this.$refs.addRuleValidate.validate((valid) => {
-        if (valid) {
-          return true
-        } else {
-          return false
-        }
+        console.log(valid)
+        this.$emit('valid', valid)
       })
     },
     addRule() {

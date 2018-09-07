@@ -8,7 +8,7 @@
               <el-button type="primary" @click="roleTable('add')" plain>添加</el-button>
             </el-col>
             <el-col :md='8' :xs="10" :sm="10">
-              <el-input placeholder="请输入内容" size='medium' v-model="searchRole" class="search_input">
+              <el-input placeholder="请输入角色名称" size='medium' v-model="searchRole" class="search_input">
                 <el-button slot="append" icon="el-icon-search" @click="searchRoleTable"></el-button>
               </el-input>
             </el-col>
@@ -68,7 +68,7 @@
       :title="dialogTit"
       :visible.sync="dialogFormVisible"
       append-to-body>
-      <addRule ref="addRule" :ruleData="dialogRole"></addRule>
+      <addRule ref="addRule"  @valid="valid" :ruleData="dialogRole"></addRule>
       <div slot="footer" class="dialog_footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="addOrEditRoleTable">确 定</el-button>
@@ -86,6 +86,7 @@ export default {
   name: 'adminCtrl',
   data() {
     return {
+      validFlag: true, // 用来判断子组件验证是否通过
       searchRole: '', // 搜索框内容
       adminTableList: [], // ⭐角色列表数据
       count: 0, // 角色总条数
@@ -114,6 +115,9 @@ export default {
     this.getSumRoleList()
   },
   methods: {
+    valid(val) {
+      this.validFlag = val
+    },
     /**
      * 切换每页显示条数
      */
@@ -129,13 +133,6 @@ export default {
       this.getSumRoleList()
     },
     searchRoleTable() {
-      if (this.searchRole === '') {
-        this.$message({
-          type: 'warning',
-          message: '搜索条件不能为空！'
-        })
-        return false
-      }
       this.getSumRoleList()
     },
     /**
@@ -153,7 +150,6 @@ export default {
         const res = response.data
         if (res.e === '000000') {
           this.dialogRole = res.d
-          console.log(this.dialogRole)
           this.dialogRole.sumRoleStatus = this.dialogRole.sumRoleStatus === 0
         }
       })
@@ -186,6 +182,13 @@ export default {
       let isList = true
       if (Array.isArray(row)) {
         data.ids = row.join()
+        if (row.length === 0) {
+          this.$message({
+            message: '请勾选您要删除的内容',
+            type: 'warning'
+          })
+          return false
+        }
         isList = true
       } else {
         data.id = row.sumRoleId
@@ -274,7 +277,8 @@ export default {
         sumRoleApp: this.dialogRole.sumRoleApp,
         sumRoleStatus: this.dialogRole.sumRoleStatus ? 0 : 1
       }
-      if (!this.$refs.addRule.intercept()) {
+      this.$refs.addRule.intercept()
+      if (!this.validFlag) {
         return false
       }
       if (!this.isAddOrEdit) {

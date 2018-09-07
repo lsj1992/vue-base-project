@@ -10,7 +10,7 @@
               <el-button type="primary" @click="addOrEditFlow('add')"  plain>添加</el-button>
             </el-col>
             <el-col :md='8' :xs="10" :sm="10">
-              <el-input placeholder="请输入内容" size='medium' v-model="fuzzyQueryName" class="input-with-select">
+              <el-input placeholder="请输入工作流名称" size='medium' v-model="fuzzyQueryName" class="input-with-select">
                 <el-button slot="append" @click="getFlowList" icon="el-icon-search"></el-button>
               </el-input>
             </el-col>
@@ -300,7 +300,7 @@ export default {
       teamList: [], // 分组列表【select下拉框中的值】
       fuzzyQueryName: '', // 模糊查询
       flowList: [], // 查询出的工作流 列表
-      currentPage: 0,
+      currentPage: 1,
       pageSizes: [10, 20, 30, 40, 50],
       pageSize: 10,
       total: 0,
@@ -405,7 +405,7 @@ export default {
     getFlowList() {
       const data = {
         pageSize: this.pageSize,
-        page: this.currentPage === 0 ? 1 : this.currentPage,
+        page: this.currentPage,
         flowName: this.fuzzyQueryName
       }
       gzbFlow.getFlowList(data).then(response => {
@@ -724,7 +724,7 @@ export default {
      */
     handleCurrentChange(val) {
       this.currentPage = val
-      this.getFlowList()
+      this.showPicture()
     },
     /**
      * 增加角色
@@ -744,7 +744,6 @@ export default {
           })
           this.innerDialogVisible = false
           gzbFlow.getGzbSumRoleList().then((response) => {
-            console.log(response)
             this.RoleList = response.data.d
           })
         } else {

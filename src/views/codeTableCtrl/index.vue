@@ -4,7 +4,7 @@
       <el-col :span="24">
         <div class="search_box">
           <el-button type="primary" @click="codeTable('add')" plain>添加</el-button>
-          <el-input class="search_input" v-model="searchCon" placeholder="请输入内容">
+          <el-input class="search_input" v-model="searchCon" placeholder="请输入码表名称">
             <el-button slot="append" @click="searchCodeTable" icon="el-icon-search"></el-button>
           </el-input>
         </div>
@@ -179,8 +179,8 @@ export default {
     const validateConfigValue = (rule, value, callback) => {
       if (!value || value.trim().length <= 0) {
         callback(new Error('码表值不能为空'))
-      } else if (!/^[a-zA-Z0-9]+$/.test(value.trim())) {
-        callback(new Error('码表值只能是数字或字母'))
+      } else if (!/^[a-zA-Z0-9_]+$/.test(value.trim())) {
+        callback(new Error('码表值只能是数字、字母或下划线'))
       } else {
         callback()
       }
@@ -461,8 +461,8 @@ export default {
               this.tableFlag = false
               this.flag = false
               return false
-            } else if (!/^[a-zA-Z0-9]+$/.test(item.codeValue.trim())) {
-              this.msg = '码值只能是数字和字母'
+            } else if (!/^[a-zA-Z0-9_]+$/.test(item.codeValue.trim())) {
+              this.msg = '码值只能是数字、字母或下划线'
               this.tableFlag = false
               this.flag = false
               return false
@@ -503,11 +503,13 @@ export default {
         return false
       }
       const data = {
-        id: this.dialogCode.id,
         configName: this.dialogCode.configName,
         configValue: this.dialogCode.configValue,
         configDescription: this.dialogCode.configDescription,
         configCodeListStr: JSON.stringify(this.codeValueList)
+      }
+      if (!this.isAddOrEdit) {
+        data.id = this.dialogCode.id
       }
       const msg = this.isAddOrEdit ? '添加码表成功' : '修改码表成功'
       const errorMsg = this.isAddOrEdit ? '添加码表失败' : '修改码表失败'
