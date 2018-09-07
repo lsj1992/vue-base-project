@@ -256,6 +256,10 @@ export default {
       this.dialogFormVisible = true
       this.disabled = false
       this.dialogRole = {}
+      // this.$refs.addRule.clearValid()
+      this.$nextTick().then(() => {
+        this.$refs.addRule.clearValid()
+      })
       if (status === 'edit') {
         this.getRoleValue(row)
         this.dialogTit = '编辑角色'

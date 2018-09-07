@@ -114,6 +114,9 @@ export default {
     }
   },
   methods: {
+    clearValid() {
+      this.$refs.addRuleValidate.clearValidate()
+    },
     changeFlowStatus() {},
     intercept() {
       this.$refs.addRuleValidate.validate((valid) => {
