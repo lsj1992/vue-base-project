@@ -10,6 +10,7 @@
     </el-row>
     <!-- banner 列表组件 -->
     <banner-list
+      v-show="showPagination"
       :showRadio="showRadio"
       ref="showBanner"
       :isDialog="false"
@@ -97,6 +98,7 @@ export default {
   data() {
     return {
       imagesTableList: [],
+      showPagination: true, // 控制分页组件是否显示
       total: 0,
       pageSize: 10,
       pageSizes: [10, 20, 30, 40, 50],
@@ -174,6 +176,11 @@ export default {
           if (res.code === '000000') {
             this.imagesTableList = res.data
             this.total = res.count
+            if (this.total === 0) {
+              this.showPagination = false
+            } else {
+              this.showPagination = true
+            }
           } else if (res.e === '1000015') {
             this.$message({
               message: res.m ? res.m : '获取轮播列表失败！',
@@ -312,7 +319,6 @@ export default {
           this.detailBannerData = res.d
           this.detailBannerData.bannerType = this.detailBannerData.bannerType.toString()
           this.showDialogImgList = false
-          console.log(this.detailBannerData.bannerPicId)
         }
       })
     },
@@ -334,6 +340,11 @@ export default {
               type: 'success',
               message: '删除成功!'
             })
+            if (this.total === 0) {
+              this.showPagination = false
+            } else {
+              this.showPagination = true
+            }
           }
         })
       }).catch(() => {

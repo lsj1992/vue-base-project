@@ -70,10 +70,11 @@
       </el-table-column>
     </el-table>
     <el-pagination
+      v-show="showPagination"
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage"
+      :current-page.sync="currentPage"
       :page-sizes="pageSizes"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
@@ -301,6 +302,7 @@ export default {
       fuzzyQueryName: '', // 模糊查询
       flowList: [], // 查询出的工作流 列表
       currentPage: 1,
+      showPagination: true, // 是否展示分页组件
       pageSizes: [10, 20, 30, 40, 50],
       pageSize: 10,
       total: 0,
@@ -413,6 +415,11 @@ export default {
         if (res.code === '000000') {
           this.flowList = res.data
           this.total = res.count
+          if (this.total === 0) {
+            this.showPagination = false
+          } else {
+            this.showPagination = true
+          }
         } else if (res.e === '1000015') {
           this.$message({
             message: res.m ? res.m : '获取工作流列表失败！',
@@ -506,6 +513,11 @@ export default {
               this.total--
             }
             this.total = this.flowList.length
+            if (this.total === 0) {
+              this.showPagination = false
+            } else {
+              this.showPagination = true
+            }
           } else if (res.e === '1000015') {
             this.$message({
               message: res.m ? res.m : '删除工作流失败！',

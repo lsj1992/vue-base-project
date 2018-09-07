@@ -58,6 +58,7 @@
     </el-table>
     <!-- 图片列表的分页 -->
     <el-pagination
+      v-show="showPagination"
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -123,11 +124,12 @@ export default {
   data() {
     return {
       imagesTableList: [],
+      showPagination: true,
       total: 0,
       pageSize: 10,
       pageSizes: [10, 20, 30, 40, 50],
       currentPage: 1,
-      uploadUrl: '/crm/bannerPic/insertPicture',
+      uploadUrl: process.env.BASE_API + '/crm/bannerPic/insertPicture',
       // fileUrl: process.env.files_href,
       imgBaseUrl: process.env.files_href,
       uploadData: {
@@ -153,6 +155,7 @@ export default {
      * 上传到服务器
      */
     submitUpload() {
+      console.log('山川图片------------158行')
       this.uploadData.token = this.token
       // this.uploadData.name = this.token
       this.$refs.uploadImgForm.submit()
@@ -173,7 +176,7 @@ export default {
         this.dialogFormVisible = false
       } else if (res.e === '1000015') {
         this.$message({
-          message: res.m ? res.m : '上传图片图片失败！',
+          message: res.m ? res.m : '上传图片失败！',
           type: 'warning'
         })
         this.$nextTick().then(() => {
@@ -183,7 +186,7 @@ export default {
         })
       } else {
         this.$message({
-          message: res.m ? res.m : '上传图片图片失败！',
+          message: res.m ? res.m : '上传图片失败！',
           type: 'warning'
         })
       }
@@ -193,7 +196,7 @@ export default {
      */
     uploadError(err) {
       this.$message({
-        message: err.m ? err.m : '上传图片图片失败！',
+        message: err.m ? err.m : '上传图片失败！',
         type: 'warning'
       })
     },
@@ -230,6 +233,11 @@ export default {
             console.log(item.picStatus)
           })
           this.total = res.count
+          if (this.total === 0) {
+            this.showPagination = false
+          } else {
+            this.showPagination = true
+          }
         } else if (res.e === '1000015') {
           this.$message({
             message: res.m ? res.m : '获取图片列表失败！',
