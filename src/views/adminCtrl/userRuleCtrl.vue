@@ -1,6 +1,6 @@
 <template>
-      <el-form class="peolesCtrl"> 
-        <el-form-item label="班组">
+      <el-form class="peolesCtrl" label-position="top" label-width="80px"> 
+        <el-form-item label="班组" >
           <el-select v-model="groupList" @change="groupName" placeholder="请选择">
             <el-option
              v-for="item in items"
@@ -10,7 +10,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="名称" >
+        <el-form-item label="工作流名称" >
           <el-select v-model="flowList" @change="flowRole" placeholder="请选择">
             <el-option
              v-for="item in flows"
@@ -215,7 +215,7 @@ export default {
       if (data.flowId === '' || data.flowId === undefined) {
         this.$message({
           type: 'warning',
-          message: '名称不能为空！'
+          message: '工作流名称不能为空！'
         })
         return false
       }
@@ -260,7 +260,7 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .peolesCtrl {
-  padding: 30px 20px 20px;
+  padding: 30px 40px 20px;
 }
 .peolesCtrl >>> .el-form-item__label {
   text-align: center;
