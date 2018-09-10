@@ -18,6 +18,11 @@ import './errorLog'// error log
 import './permission' // permission control
 
 import './mock' // simulation data
+import BaiduMap from 'vue-baidu-map'
+Vue.use(BaiduMap, {
+  /* Visit http://lbsyun.baidu.com/apiconsole/key for details about app key. */
+  ak: '2AzZMFXbazx9PusRVfmC7kGesTyuks8d'
+})
 
 // import '@/directive/dialog' // 给elementUI的dialog上加上 v-dialogDrag 指令就可以实现弹窗的全屏和拉伸了
 
