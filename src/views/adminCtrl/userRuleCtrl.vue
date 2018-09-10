@@ -212,7 +212,8 @@ export default {
         })
         return false
       }
-      if (data.flowId === '' || data.flowId === undefined) {
+      if (this.flowList === '' || this.flowList === undefined) {
+        console.log(this.flowList)
         this.$message({
           type: 'warning',
           message: '工作流名称不能为空！'

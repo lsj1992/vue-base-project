@@ -22,7 +22,7 @@
             </el-select>
             </el-col>
             <el-col :span="8">
-              <el-input placeholder="请输入班组名称或工作流名称" size='medium' v-model="fuzzyQuery" class="input-with-select">
+              <el-input placeholder="请输入工作流名称" size='medium' v-model="fuzzyQuery" class="input-with-select">
                 <el-button slot="append" @click="fuzzyFlowListQuery" icon="el-icon-search"></el-button>
               </el-input>
             </el-col>
