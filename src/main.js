@@ -17,7 +17,7 @@ import './icons' // icon
 import './errorLog'// error log
 import './permission' // permission control
 
-// import './mock' // simulation data
+import './mock' // simulation data
 
 // import '@/directive/dialog' // 给elementUI的dialog上加上 v-dialogDrag 指令就可以实现弹窗的全屏和拉伸了
 
