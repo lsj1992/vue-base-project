@@ -31,104 +31,32 @@ export const constantRouterMap = [
   { path: '/401', component: () => import('@/views/errorPage/401'), hidden: true },
   {
     path: '/',
-    redirect: '/adminRole'
+    redirect: '/projectManage'
   },
   {
-    path: '/adminRole',
+    path: '/projectManage',
     component: Layout,
     alwaysShow: true, // will always show the root menu
-    redirect: '/adminRole/index',
+    redirect: '/projectManage/create',
     meta: {
-      title: '角色管理',
+      title: '项目管理',
       icon: 'adminRole',
       keepAlive: false, // 用来区分是否需要缓存
       roles: ['admin', 'editor'] // 用来做权限控制，暂时没有权限管理，roles必须加上admin才能让菜单栏显示出来
     },
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/adminCtrl/index'),
-        name: 'adminCtrl',
+        path: 'create',
+        component: () => import('@/views/projectManage/createProject/index'),
+        name: 'createProject',
         keepAlive: false,
-        meta: { title: '角色管理', keepAlive: false, noCache: true }
+        meta: { title: '创建项目', keepAlive: false, noCache: true }
       },
       {
-        path: 'userRuleCtrl',
-        component: () => import('@/views/adminCtrl/userRuleCtrl'),
-        name: 'userRuleCtrl',
+        path: 'addProject',
+        component: () => import('@/views/projectManage/addProject/index'),
+        name: 'addProject',
         meta: { title: '用户角色管理', keepAlive: false, noCache: true }
-      }
-    ]
-  },
-  {
-    path: '/workFlowCtrl',
-    component: Layout,
-    alwaysShow: true, // will always show the root menu
-    redirect: '/workFlowCtrl/index',
-    // redirect: 'noredirect',
-    meta: {
-      title: '工作流管理',
-      icon: 'workFlow',
-      roles: ['admin', 'editor'] // 用来做权限控制
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'workFlowCtrl',
-        component: () => import('@/views/workFlowCtrl/index'),
-        meta: { title: '工作流列表', keepAlive: false, noCache: true }
-      },
-      {
-        path: 'workFlowAuth',
-        component: () => import('@/views/workFlowCtrl/workFlowAuth'),
-        name: 'workFlowAuth',
-        meta: { title: '工作流权限', keepAlive: true, noCache: true }
-      }
-    ]
-  },
-  {
-    path: '/bannerCtrl',
-    component: Layout,
-    alwaysShow: true, // will always show the root menu
-    redirect: '/bannerCtrl/index',
-    // redirect: 'noredirect',
-    meta: {
-      title: '轮播管理',
-      icon: 'bannerSwper',
-      roles: ['admin', 'editor'] // 用来做权限控制
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'bannerCtrl',
-        component: () => import('@/views/bannerCtrl/index'),
-        meta: { title: '轮播列表', keepAlive: false, noCache: true }
-      },
-      {
-        path: 'imagesCtrl',
-        name: 'imagesCtrl',
-        component: () => import('@/views/bannerCtrl/imagesCtrl'),
-        meta: { title: '图片管理', keepAlive: false, noCache: true }
-      }
-    ]
-  },
-  {
-    path: '/codeTableCtrl',
-    component: Layout,
-    alwaysShow: true, // will always show the root menu
-    redirect: '/codeTableCtrl/index',
-    // redirect: 'noredirect',
-    meta: {
-      title: '码表管理',
-      icon: 'codeTable',
-      roles: ['admin', 'editor'] // 用来做权限控制
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'codeTableCtrl',
-        component: () => import('@/views/codeTableCtrl/index'),
-        meta: { title: '码表管理', keepAlive: false, noCache: true }
       }
     ]
   }
