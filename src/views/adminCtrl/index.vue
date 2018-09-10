@@ -114,7 +114,7 @@ export default {
 
   },
   created() {
-    this.getSumRoleList()
+    this.getSumRoleList()// 获取数据
   },
   methods: {
     valid(val) {
@@ -189,7 +189,7 @@ export default {
       let isList = true
       if (Array.isArray(row)) {
         data.ids = row.join()
-        if (row.length === 0) {
+        if (row.length === 0) { // 批量删除
           this.$message({
             message: '请勾选您要删除的内容',
             type: 'warning'
@@ -220,7 +220,15 @@ export default {
             } else {
               this.adminTableList.splice(this.adminTableList.findIndex(item => item.sumRoleId === row.sumRoleId), 1)
             }
-            this.total = this.adminTableList.length
+            if (isList) { // 总条数
+              this.total = this.total - row.length
+            } else {
+              this.total--
+            }
+            if (this.adminTableList.length === 0) { // 当前页
+              this.currentPage--
+              this.getSumRoleList()
+            }
           } else {
             this.$message({
               type: 'warning',
