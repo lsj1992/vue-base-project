@@ -19,6 +19,9 @@ import './permission' // permission control
 
 import './mock' // simulation data
 import BaiduMap from 'vue-baidu-map'
+// import '../node_modules/bmaplib.drawingmanager/'
+// import 'http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js'
+// import 'http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css'
 Vue.use(BaiduMap, {
   /* Visit http://lbsyun.baidu.com/apiconsole/key for details about app key. */
   ak: '2AzZMFXbazx9PusRVfmC7kGesTyuks8d'

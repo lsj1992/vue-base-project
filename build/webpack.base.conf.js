@@ -31,6 +31,10 @@ module.exports = {
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath
   },
+  externals: {
+    "BMap": "BMap",
+    "BMapLib": "BMapLib"
+  },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {

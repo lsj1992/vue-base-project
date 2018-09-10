@@ -1,14 +1,21 @@
 <template>
   
   <div class="add_project">
-    <!-- 增加百度地图 -->
-    <baidu-map class="map" :zoom="zoom" @ready="handler" :center="center"></baidu-map>
-    <!-- <baidu-map :center="center" :zoom="zoom" @ready="handler"></baidu-map> -->
+    <div>
+      <!-- 增加百度地图 -->
+      <baidu-map ref='baidu_map'
+        class="map"
+        :scroll-wheel-zoom="true"
+        :zoom="zoom"
+        @ready="handler" 
+        :center="center">
+        <!-- mapType="BMAP_NORMAL_MAP,BMAP_HYBRID_MAP" -->
+      </baidu-map>
+    </div>
   </div>
 </template>
 
 <script>
-// import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
 export default {
   components: { },
   name: 'addProject',
@@ -22,10 +29,11 @@ export default {
   },
   methods: {
     handler({ BMap, map }) {
+      const _this = this
       console.log(BMap, map)
-      this.center.lng = 116.404
-      this.center.lat = 39.915
-      this.zoom = 15
+      _this.center.lng = 116.404
+      _this.center.lat = 39.915
+      _this.zoom = 15
     }
   },
   mounted() {
@@ -34,6 +42,11 @@ export default {
   }
 }
 </script>
+<style>
+.anchorBL {
+  display:none;
+}
+</style>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .map {
